@@ -1,6 +1,7 @@
 import type { AxiosResponse, InternalAxiosRequestConfig } from 'axios'
 import axios from 'axios'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import TOKEN_KEY from '@/enums/CaheEnum'
 
 const service = axios.create({
   baseURL: import.meta.env.VITE_APP_BASE_API,
@@ -10,6 +11,9 @@ const service = axios.create({
 
 service.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
+    const accessToken = useStorage(TOKEN_KEY, '')
+    if (accessToken.value)
+      config.headers.Authorization = `Bearer ${accessToken.value}`
     return config
   },
   (error: any) => {

@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia'
+import { ElMessage } from 'element-plus'
 import type { LoginDataType } from '@/api/auth/type'
 import { loginAPI } from '@/api/auth'
 import TOKEN_KEY from '@/enums/CaheEnum'
@@ -12,7 +13,10 @@ export const useUserStore = defineStore('user', () => {
     return new Promise<void>((resolve, reject) => {
       loginAPI(data)
         .then((response) => {
-          useStorage(TOKEN_KEY, response.data.data)
+          const { data } = response.data
+          useStorage(TOKEN_KEY, data)
+          user.value.token = data
+          ElMessage.success('Login successful')
           resolve()
         })
         .catch((error) => {
@@ -22,5 +26,6 @@ export const useUserStore = defineStore('user', () => {
   }
   return {
     login,
+    user,
   }
 })
