@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { FormInstance } from 'element-plus'
-import { computed, ref } from 'vue'
 import type { LoginDataType } from '@/api/auth/type'
 import { useUserStore } from '@/store'
 

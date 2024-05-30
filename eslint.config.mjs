@@ -1,3 +1,10 @@
 import antfu from '@antfu/eslint-config'
+import { FlatCompat } from '@eslint/eslintrc'
 
-export default antfu()
+const compat = new FlatCompat()
+
+export default antfu(...compat.config({
+  extends: [
+    './.eslintrc-auto-import.json',
+  ],
+}))

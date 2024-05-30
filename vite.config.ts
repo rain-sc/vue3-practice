@@ -29,14 +29,19 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
       vue(),
       VueDevTools(),
       AutoImport({
+        include: [
+          /\.[tj]sx?$/,
+          /\.vue\??/,
+        ],
         imports: ['vue', '@vueuse/core', 'pinia', 'vue-router'],
         resolvers: [ElementPlusResolver()],
+        dts: true,
+        vueTemplate: true,
         eslintrc: {
-          enabled: false,
+          enabled: true,
           filepath: './.eslintrc-auto-import.json',
           globalsPropValue: true,
         },
-        vueTemplate: true,
       }),
       Components({
         resolvers: [ElementPlusResolver()],

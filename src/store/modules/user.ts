@@ -1,5 +1,4 @@
 import { defineStore } from 'pinia'
-import { useStorage } from '@vueuse/core'
 import type { LoginDataType } from '@/api/auth/type'
 import { loginAPI } from '@/api/auth'
 import TOKEN_KEY from '@/enums/CaheEnum'
