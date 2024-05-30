@@ -4,6 +4,4 @@ export interface LoginDataType {
   isAgree: boolean
 }
 
-export interface LoginResType {
-  data: string
-}
+export type LoginResType = string
