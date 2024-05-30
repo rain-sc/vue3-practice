@@ -1,15 +1,16 @@
 <script setup lang="ts">
 import type { FormInstance } from 'element-plus'
 import { computed, ref } from 'vue'
-import type { LoginData } from '@/api/auth/type'
+import type { LoginDataType } from '@/api/auth/type'
+import { useUserStore } from '@/store'
 
 const form = ref<FormInstance>()
-
-const loginForm = ref<LoginData>({
+const loginForm = ref<LoginDataType>({
   mobile: '13800000002',
   password: 'hm#qd@23!',
   isAgree: true,
 })
+const userStore = useUserStore()
 
 const loginRules = computed(() => {
   return {
@@ -40,7 +41,7 @@ const loginRules = computed(() => {
     ],
     isAgree: [
       {
-        validator: (rule, value, callback) => {
+        validator: (rule: any, value: any, callback: any) => {
           value ? callback() : callback(new Error('Please agree to the user platform use agreement'))
         },
       },
@@ -49,7 +50,12 @@ const loginRules = computed(() => {
 })
 
 async function handleLogin() {
-
+  try {
+    await userStore.login(loginForm.value)
+  }
+  catch (error) {
+    console.error(error)
+  }
 }
 </script>
 

@@ -1,14 +1,34 @@
 {
   "compilerOptions": {
-    "types": ["element-plus/global"]
-  },
-  "references": [
-    {
-      "path": "./tsconfig.node.json"
+    "target": "esnext",
+
+    "jsx": "preserve",
+    "jsxFactory": "h",
+    "jsxFragmentFactory": "Fragment",
+    "lib": ["esnext", "dom"],
+    "noLib": false,
+    "useDefineForClassFields": true,
+    "baseUrl": ".",
+    "module": "esnext",
+    "moduleResolution": "node",
+    "paths": {
+      "@/*": ["src/*"]
     },
-    {
-      "path": "./tsconfig.app.json"
-    }
+    "resolveJsonModule": true,
+    "types": ["vite/client", "unplugin-icons/types/vue", "element-plus/global"],
+    "allowJs": true,
+    "strict": true,
+    "noEmit": true,
+    "sourceMap": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true
+  },
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.vue",
+    "vite.config.ts"
   ],
-  "files": []
+  "exclude": ["node_modules", "dist", "**/*.js"]
 }
