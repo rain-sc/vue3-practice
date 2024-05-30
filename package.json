@@ -1,8 +1,8 @@
 {
   "name": "vue3-practice",
+  "type": "module",
   "version": "0.0.0",
   "private": true,
-  "type": "module",
   "scripts": {
     "dev": "vite --host",
     "build": "run-p type-check \"build-only {@}\" --",
@@ -18,9 +18,9 @@
     "normalize.css": "^8.0.1",
     "nprogress": "^0.2.0",
     "path-to-regexp": "^6.2.2",
+    "pinia": "^2.1.7",
     "vue": "^3.4.21",
-    "vue-router": "^4.3.0",
-    "vuex": "^4.0.2"
+    "vue-router": "^4.3.0"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^2.18.1",
