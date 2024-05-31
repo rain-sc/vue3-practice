@@ -5,17 +5,21 @@ import { loginAPI } from '@/api/auth'
 import { getToken, setToken } from '@/utils/auth'
 import { getUserProfileAPI } from '@/api/user'
 import store from '@/store'
+import type { UserProfileType } from '@/api/user/types'
 
-interface User {
-  token: string
-  username: string
-  roles: string[]
-}
 export const useUserStore = defineStore('user', () => {
-  const user = ref<User>({
-    token: getToken() || '',
+  const token = ref(getToken() || '')
+  const userProfile = ref<UserProfileType>({
+    userId: '',
+    mobile: '',
     username: '',
-    roles: [],
+    roles: {
+      menus: [],
+      points: [],
+      apis: [],
+    },
+    companyId: '',
+    company: '',
   })
 
   async function login(loginData: LoginDataType) {
@@ -25,7 +29,7 @@ export const useUserStore = defineStore('user', () => {
     try {
       if (data) {
         setToken(data)
-        user.value.token = data
+        token.value = data
         ElMessage.success(message)
       }
       else {
@@ -40,7 +44,7 @@ export const useUserStore = defineStore('user', () => {
   async function getUserProfile() {
     try {
       const res = await getUserProfileAPI()
-      user.value.username = res.data.data.username
+      Object.assign(userProfile.value, res.data.data)
     }
     catch (error) {
       console.error(error)
@@ -52,9 +56,10 @@ export const useUserStore = defineStore('user', () => {
   }
   return {
     login,
-    user,
+    token,
     getUserProfile,
     resetToken,
+    userProfile,
   }
 })
 
