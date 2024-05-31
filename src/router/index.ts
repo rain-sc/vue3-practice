@@ -3,9 +3,7 @@ import { createRouter, createWebHashHistory } from 'vue-router'
 
 export const routes: RouteRecordRaw[] = [
   {
-    path: '/',
-    name: 'login',
-    // path: '/login',
+    path: '/login',
     component: () => import('@/views/login/index.vue'),
     meta: { hidden: true },
   },
