@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { ElMessageBox } from 'element-plus'
-import { useUserStore } from '@/store'
+import { useAppStore, useUserStore } from '@/store'
 
 const userStore = useUserStore()
+const appStore = useAppStore()
+
 const userProfile = userStore.userProfile
 const visible = ref(false)
 
@@ -17,10 +19,20 @@ async function logout() {
     visible.value = false
   }
 }
+function toggleSideBar() {
+  appStore.toggleSidebar()
+}
 </script>
 
 <template>
   <div class="navbar-container">
+    <div class="flex">
+      <hamburger
+        :is-active="appStore.sidebar.opened"
+        @toggle-click="toggleSideBar"
+      />
+      <breadcrumb />
+    </div>
     <div class="flex items-center">
       <div class="flex-center h100% p10px">
         <img
