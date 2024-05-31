@@ -1,4 +1,4 @@
-import type { LoginDataType, LoginResType } from './type'
+import type { LoginDataType, LoginResType } from './types'
 import { http } from '@/utils/request'
 import type { ResponseData } from '@/types/global'
 
