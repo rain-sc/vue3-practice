@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { FormInstance } from 'element-plus'
-import type { LoginDataType } from '@/api/auth/type'
+import type { LoginDataType } from '@/api/auth/types'
 import { useUserStore } from '@/store'
 
 const form = ref<FormInstance>()
@@ -10,6 +10,7 @@ const loginForm = ref<LoginDataType>({
   isAgree: true,
 })
 const userStore = useUserStore()
+const router = useRouter()
 
 const loginRules = computed(() => {
   return {
@@ -51,6 +52,7 @@ const loginRules = computed(() => {
 async function handleLogin() {
   try {
     await userStore.login(loginForm.value)
+    router.push({ path: '/' })
   }
   catch (error) {
     console.error(error)
