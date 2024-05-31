@@ -20,6 +20,7 @@ export const useUserStore = defineStore('user', () => {
     },
     companyId: '',
     company: '',
+    staffPhoto: '',
   })
 
   async function login(loginData: LoginDataType) {
@@ -54,12 +55,20 @@ export const useUserStore = defineStore('user', () => {
   async function resetToken() {
     setToken('')
   }
+
+  async function logout() {
+    // 清除token
+    resetToken()
+    // 跳转到登录页
+    location.reload()
+  }
   return {
     login,
     token,
     getUserProfile,
     resetToken,
     userProfile,
+    logout,
   }
 })
 

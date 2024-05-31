@@ -4,3 +4,10 @@ export interface ResponseData<T> {
   data: T
   message: string
 }
+
+export interface AppSettings {
+  showSettings: boolean
+  fixedHeader: boolean
+  tagsView: boolean
+  sidebarLogo: boolean
+}

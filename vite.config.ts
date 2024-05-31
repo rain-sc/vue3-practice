@@ -9,6 +9,7 @@ import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
 import { createSvgIconsPlugin } from 'vite-plugin-svg-icons'
+import UnoCSS from 'unocss/vite'
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
@@ -50,6 +51,9 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
       createSvgIconsPlugin({
         // Specify the icon folder to be cached
         iconDirs: [path.resolve(process.cwd(), 'src/assets/icons')],
+      }),
+      UnoCSS({
+        hmrTopLevelAwait: false,
       }),
     ],
     optimizeDeps: {
@@ -159,6 +163,15 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
         '@': fileURLToPath(new URL('./src', import.meta.url)),
       },
     },
-
+    css: {
+      preprocessorOptions: {
+        scss: {
+          javascriptEnabled: true,
+          additionalData: `
+            @use "@/assets/styles/variables.scss" as *;
+          `,
+        },
+      },
+    },
   }
 })

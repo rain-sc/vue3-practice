@@ -1,10 +1,22 @@
 <script setup lang="ts">
+import {
+  useAppStore,
+} from '@/store'
 
+const appStore = useAppStore()
+const classObj = computed(() => ({
+  hideSidebar: !appStore.sidebar.opened,
+  openSidebar: appStore.sidebar.opened,
+}))
 </script>
 
 <template>
-  <div>
-    layout
+  <div class="wh-full layout-left" :class="classObj">
+    <div class="main-container">
+      <div>
+        <NavBar />
+      </div>
+    </div>
   </div>
 </template>
 

@@ -5,6 +5,7 @@ export interface UserProfileType {
   roles: UserRolesType
   companyId: string
   company: string
+  staffPhoto: string
 }
 
 export interface UserRolesType {
