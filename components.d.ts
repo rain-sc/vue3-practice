@@ -25,11 +25,13 @@ declare module 'vue' {
     ElPopover: typeof import('element-plus/es')['ElPopover']
     ElScrollbar: typeof import('element-plus/es')['ElScrollbar']
     Hamburger: typeof import('./src/components/Hamburger/index.vue')['default']
+    Menu: typeof import('./src/components/Sidebar/Menu.vue')['default']
     NavBar: typeof import('./src/components/NavBar/index.vue')['default']
     NavbarRright: typeof import('./src/components/NavBar/NavbarRright.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     Sidebar: typeof import('./src/components/Sidebar/index.vue')['default']
+    SidebarMenu: typeof import('./src/components/Sidebar/SidebarMenu.vue')['default']
     SvgIcon: typeof import('./src/components/SvgIcon/index.vue')['default']
     TagsView: typeof import('./src/components/TagsView/index.vue')['default']
   }
