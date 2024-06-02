@@ -23,6 +23,7 @@ declare module 'vue' {
     ElIcon: typeof import('element-plus/es')['ElIcon']
     ElInput: typeof import('element-plus/es')['ElInput']
     ElPopover: typeof import('element-plus/es')['ElPopover']
+    ElScrollbar: typeof import('element-plus/es')['ElScrollbar']
     Hamburger: typeof import('./src/components/Hamburger/index.vue')['default']
     NavBar: typeof import('./src/components/NavBar/index.vue')['default']
     NavbarRright: typeof import('./src/components/NavBar/NavbarRright.vue')['default']

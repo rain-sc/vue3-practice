@@ -53,7 +53,7 @@ function toggleSideBar() {
           </el-button>
         </div>
         <template #reference>
-          <el-icon @click="visible = true">
+          <el-icon class="mx-2 cursor-pointer" @click="visible = true">
             <SwitchButton />
           </el-icon>
         </template>
