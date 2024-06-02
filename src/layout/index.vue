@@ -8,6 +8,15 @@ const classObj = computed(() => ({
   hideSidebar: !appStore.sidebar.opened,
   openSidebar: appStore.sidebar.opened,
 }))
+const width = useWindowSize().width
+const WIDTH_DESKTOP = 992
+
+watchEffect(() => {
+  if (width.value >= WIDTH_DESKTOP)
+    appStore.openSideBar()
+  else
+    appStore.closeSideBar()
+})
 </script>
 
 <template>
