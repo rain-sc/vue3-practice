@@ -3,6 +3,7 @@ import axios from 'axios'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import TOKEN_KEY from '@/enums/CaheEnum'
 import { useUserStoreHook } from '@/store/modules/user'
+import router from '@/router'
 
 function logout() {
   useUserStoreHook().resetToken()
@@ -38,6 +39,7 @@ service.interceptors.response.use(
         cancelButtonText: 'Cancel',
         type: 'warning',
       })
+      router.push('/login')
       logout()
     }
     ElMessage({
