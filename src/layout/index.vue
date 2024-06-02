@@ -16,6 +16,7 @@ const classObj = computed(() => ({
       <div>
         <NavBar />
       </div>
+      <AppMain />
     </div>
   </div>
 </template>
