@@ -10,15 +10,11 @@ declare module 'vue' {
     AppLink: typeof import('./src/components/AppLink/index.vue')['default']
     AppMain: typeof import('./src/components/AppMain/index.vue')['default']
     Breadcrumb: typeof import('./src/components/Breadcrumb/index.vue')['default']
-    ElBacktop: typeof import('element-plus/es')['ElBacktop']
     ElBreadcrumb: typeof import('element-plus/es')['ElBreadcrumb']
     ElBreadcrumbItem: typeof import('element-plus/es')['ElBreadcrumbItem']
     ElButton: typeof import('element-plus/es')['ElButton']
     ElCard: typeof import('element-plus/es')['ElCard']
     ElCheckbox: typeof import('element-plus/es')['ElCheckbox']
-    ElDropdown: typeof import('element-plus/es')['ElDropdown']
-    ElDropdownItem: typeof import('element-plus/es')['ElDropdownItem']
-    ElDropdownMenu: typeof import('element-plus/es')['ElDropdownMenu']
     ElForm: typeof import('element-plus/es')['ElForm']
     ElFormItem: typeof import('element-plus/es')['ElFormItem']
     ElIcon: typeof import('element-plus/es')['ElIcon']
@@ -27,10 +23,10 @@ declare module 'vue' {
     ElMenuItem: typeof import('element-plus/es')['ElMenuItem']
     ElPopover: typeof import('element-plus/es')['ElPopover']
     ElScrollbar: typeof import('element-plus/es')['ElScrollbar']
+    ElTable: typeof import('element-plus/es')['ElTable']
+    ElTableColumn: typeof import('element-plus/es')['ElTableColumn']
     Hamburger: typeof import('./src/components/Hamburger/index.vue')['default']
-    Menu: typeof import('./src/components/Sidebar/Menu.vue')['default']
     NavBar: typeof import('./src/components/NavBar/index.vue')['default']
-    NavbarRright: typeof import('./src/components/NavBar/NavbarRright.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     Sidebar: typeof import('./src/components/Sidebar/index.vue')['default']
@@ -39,6 +35,8 @@ declare module 'vue' {
     SidebarMenuItem: typeof import('./src/components/Sidebar/SidebarMenuItem.vue')['default']
     SidebarMenuItemTitle: typeof import('./src/components/Sidebar/SidebarMenuItemTitle.vue')['default']
     SvgIcon: typeof import('./src/components/SvgIcon/index.vue')['default']
-    TagsView: typeof import('./src/components/TagsView/index.vue')['default']
+  }
+  export interface ComponentCustomProperties {
+    vLoading: typeof import('element-plus/es')['ElLoadingDirective']
   }
 }

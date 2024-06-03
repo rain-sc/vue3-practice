@@ -72,7 +72,7 @@ export const routes: RouteRecordRaw[] = [
       component: () => import('@/views/role/index.vue'),
       meta: {
         title: 'Role',
-        icon: 'tree',
+        icon: 'setting',
       },
     }],
   },
@@ -85,7 +85,7 @@ export const routes: RouteRecordRaw[] = [
       component: () => import('@/views/employee/index.vue'),
       meta: {
         title: 'Employee',
-        icon: 'tree',
+        icon: 'people',
       },
     }],
   },

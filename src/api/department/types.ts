@@ -1,16 +1,14 @@
-export interface DepartmentType {
-  companyId: string
-  companyName: string
-  companyManage: string
-  depts: DepartmentListType[]
+export interface DepartmentListType extends DepartmentListBaseType {
+  children?: DepartmentListBaseType[]
 }
 
-export interface DepartmentListType {
+export interface DepartmentListBaseType {
   code: string
   createTime: string
-  id: string
+  id: number
   introduce: string
-  manager: string
+  managerId: number
+  managerName: string
   name: string
-  pid: string
+  pid: number
 }
