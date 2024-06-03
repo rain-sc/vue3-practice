@@ -1,25 +1,20 @@
 <script setup lang="ts">
 import type { RouteLocationMatched } from 'vue-router'
 import { compile } from 'path-to-regexp'
-import router from '@/router'
 
-const currentRoute = useRoute()
-function pathCompile(path: string) {
-  const { params } = currentRoute
-  const toPath = compile(path)
-  return toPath(params)
-}
-
-const breadcrumbs = ref<Array<RouteLocationMatched>>([])
+const breadcrumbs = ref<RouteLocationMatched[]>([])
+const route = useRoute()
+const router = useRouter()
 
 function getBreadcrumb() {
-  let matched = currentRoute.matched.filter(
+  let matched = route.matched.filter(
     item => item.meta && item.meta.title,
   )
   const first = matched[0]
+
   if (!isDashboard(first)) {
     matched = [
-      { path: '/dashboard', meta: { title: 'dashboard' } } as any,
+      { path: '/dashboard', meta: { title: 'Dashboard' } } as any,
     ].concat(matched)
   }
   breadcrumbs.value = matched.filter((item) => {
@@ -38,28 +33,26 @@ function isDashboard(route: RouteLocationMatched) {
   )
 }
 
-function handleLink(item: any) {
-  const { redirect, path } = item
-  if (redirect) {
-    router.push(redirect).catch((err) => {
-      console.warn(err)
-    })
-    return
-  }
-  router.push(pathCompile(path)).catch((err) => {
-    console.warn(err)
-  })
+function pathCompile(path: string) {
+  const toPath = compile(path)
+  return toPath(route.params)
 }
 
-watch(
-  () => currentRoute.path,
-  (path) => {
-    if (path.startsWith('/redirect/'))
-      return
+function handleLink(item: RouteLocationMatched) {
+  const { redirect, path } = item
+  if (redirect) {
+    router.push(redirect as string)
+    return
+  }
+  router.push(pathCompile(path))
+}
 
-    getBreadcrumb()
-  },
-)
+watch(() => route.path, (path) => {
+  if (path.startsWith('/redirect/'))
+    return
+
+  getBreadcrumb()
+})
 
 onBeforeMount(() => {
   getBreadcrumb()
@@ -67,29 +60,26 @@ onBeforeMount(() => {
 </script>
 
 <template>
-  <el-breadcrumb class="flex-y-center">
-    <transition-group
-      enter-active-class="animate__animated animate__fadeInRight"
-    >
-      <el-breadcrumb-item v-for="(item, index) in breadcrumbs" :key="item.path">
-        <span
-          v-if="
-            item.redirect === 'noredirect' || index === breadcrumbs.length - 1
-          "
-          class="color-gray-400"
-        >{{ item.meta.title }}</span>
-        <a v-else @click.prevent="handleLink(item)">
-          {{ item.meta.title }}
-        </a>
-      </el-breadcrumb-item>
-    </transition-group>
+  <el-breadcrumb>
+    <el-breadcrumb-item v-for="(item, index) in breadcrumbs" :key="item.path">
+      <span v-if="item.redirect === 'noRedirect' || index === breadcrumbs.length - 1" class="no-redirect">
+        {{ item.meta.title }}
+      </span>
+      <a v-else @click.prevent="handleLink(item)">
+        {{ item.meta.title }}
+      </a>
+    </el-breadcrumb-item>
   </el-breadcrumb>
 </template>
 
 <style lang="scss" scoped>
-// 覆盖 element-plus 的样式
-.el-breadcrumb__inner,
-.el-breadcrumb__inner a {
-  font-weight: 400 !important;
+.el-breadcrumb {
+  line-height: var(--v3-navigationbar-height);
+  .no-redirect {
+    color: var(--el-text-color-placeholder);
+  }
+  a {
+    font-weight: normal;
+  }
 }
 </style>

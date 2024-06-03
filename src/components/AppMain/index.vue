@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import variables from '@/assets/styles/variables.module.scss'
 </script>
 
 <template>

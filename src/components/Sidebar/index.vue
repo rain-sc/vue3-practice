@@ -4,8 +4,6 @@ import { useAppStore } from '@/store'
 
 const appStore = useAppStore()
 const sidebarLogo = computed(() => appStore.sidebarLogo)
-
-console.log('router', router)
 </script>
 
 <template>
