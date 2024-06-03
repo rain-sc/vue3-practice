@@ -31,8 +31,8 @@ export const routes: RouteRecordRaw[] = [
         component: () => import('@/views/dashboard/index.vue'),
         name: 'Dashboard',
         meta: {
-          title: 'dashboard',
-          icon: 'homepage',
+          title: 'Dashboard',
+          icon: 'dashboard',
           affix: true,
           keepAlive: true,
           alwaysShow: false,
@@ -58,7 +58,7 @@ export const routes: RouteRecordRaw[] = [
       name: 'department',
       component: () => import('@/views/department/index.vue'),
       meta: {
-        title: 'department',
+        title: 'Department',
         icon: 'tree',
       },
     }],
@@ -71,7 +71,7 @@ export const routes: RouteRecordRaw[] = [
       name: 'role',
       component: () => import('@/views/role/index.vue'),
       meta: {
-        title: 'role',
+        title: 'Role',
         icon: 'tree',
       },
     }],
@@ -84,7 +84,7 @@ export const routes: RouteRecordRaw[] = [
       name: 'employee',
       component: () => import('@/views/employee/index.vue'),
       meta: {
-        title: 'employee',
+        title: 'Employee',
         icon: 'tree',
       },
     }],
@@ -97,7 +97,7 @@ export const routes: RouteRecordRaw[] = [
       name: 'permission',
       component: () => import('@/views/permission/index.vue'),
       meta: {
-        title: 'permission',
+        title: 'Permission',
         icon: 'lock',
       },
     }],
@@ -110,7 +110,7 @@ export const routes: RouteRecordRaw[] = [
       name: 'attendance',
       component: () => import('@/views/attendance/index.vue'),
       meta: {
-        title: 'attendance',
+        title: 'Attendance',
         icon: 'excel',
       },
     }],
@@ -123,7 +123,7 @@ export const routes: RouteRecordRaw[] = [
       name: 'approval',
       component: () => import('@/views/approval/index.vue'),
       meta: {
-        title: 'approval',
+        title: 'Approval',
         icon: 'tree-table',
       },
     }],
@@ -136,7 +136,7 @@ export const routes: RouteRecordRaw[] = [
       name: 'salary',
       component: () => import('@/views/salary/index.vue'),
       meta: {
-        title: 'salary',
+        title: 'Salary',
         icon: 'money',
       },
     }],
@@ -149,7 +149,7 @@ export const routes: RouteRecordRaw[] = [
       name: 'social',
       component: () => import('@/views/social/index.vue'),
       meta: {
-        title: 'social',
+        title: 'Social',
         icon: 'table',
       },
     }],

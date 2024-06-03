@@ -6,6 +6,7 @@ export interface ResponseData<T> {
 }
 
 export interface AppSettings {
+  title: string
   showSettings: boolean
   fixedHeader: boolean
   tagsView: boolean

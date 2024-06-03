@@ -40,7 +40,7 @@ const getStyle = computed((): CSSProperties => {
 
 <template>
   <svg
-    :class="[$attrs.class, spin && 'svg-icon-spin']"
+    class="svg-icon"
     :style="getStyle"
     aria-hidden="true"
   >
@@ -49,16 +49,13 @@ const getStyle = computed((): CSSProperties => {
 </template>
 
 <style lang="scss" scoped>
-  // @prefix-cls: ~'@{namespace}-svg-icon';
-
-  // .@{prefix-cls} {
-  //   display: inline-block;
-  //   overflow: hidden;
-  //   fill: currentcolor;
-  //   vertical-align: -0.15em;
-  // }
-
-  // .svg-icon-spin {
-  //   animation: loadingCircle 1s infinite linear;
-  // }
+.svg-icon {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  overflow: hidden;
+  vertical-align: -0.15em;
+  outline: none;
+  fill: currentcolor;
+}
 </style>

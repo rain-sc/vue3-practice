@@ -8,6 +8,10 @@ export const useAppStore = defineStore('app', () => {
     opened: sidebarStatus.value === SidebarStatusEnum.OPENED,
     withoutAnimation: false,
   })
+  const sidebarLogo = useStorage<boolean>(
+    'sidebarLogo',
+    defaultSettings.sidebarLogo,
+  )
 
   function toggleSidebar() {
     sidebar.opened = !sidebar.opened
@@ -31,6 +35,7 @@ export const useAppStore = defineStore('app', () => {
     toggleSidebar,
     closeSideBar,
     openSideBar,
+    sidebarLogo,
   }
 })
 

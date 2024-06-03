@@ -7,6 +7,7 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    AppLink: typeof import('./src/components/AppLink/index.vue')['default']
     AppMain: typeof import('./src/components/AppMain/index.vue')['default']
     Breadcrumb: typeof import('./src/components/Breadcrumb/index.vue')['default']
     ElBacktop: typeof import('element-plus/es')['ElBacktop']
@@ -22,6 +23,8 @@ declare module 'vue' {
     ElFormItem: typeof import('element-plus/es')['ElFormItem']
     ElIcon: typeof import('element-plus/es')['ElIcon']
     ElInput: typeof import('element-plus/es')['ElInput']
+    ElMenu: typeof import('element-plus/es')['ElMenu']
+    ElMenuItem: typeof import('element-plus/es')['ElMenuItem']
     ElPopover: typeof import('element-plus/es')['ElPopover']
     ElScrollbar: typeof import('element-plus/es')['ElScrollbar']
     Hamburger: typeof import('./src/components/Hamburger/index.vue')['default']
@@ -31,7 +34,10 @@ declare module 'vue' {
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     Sidebar: typeof import('./src/components/Sidebar/index.vue')['default']
+    SidebarLogo: typeof import('./src/components/Sidebar/SidebarLogo.vue')['default']
     SidebarMenu: typeof import('./src/components/Sidebar/SidebarMenu.vue')['default']
+    SidebarMenuItem: typeof import('./src/components/Sidebar/SidebarMenuItem.vue')['default']
+    SidebarMenuItemTitle: typeof import('./src/components/Sidebar/SidebarMenuItemTitle.vue')['default']
     SvgIcon: typeof import('./src/components/SvgIcon/index.vue')['default']
     TagsView: typeof import('./src/components/TagsView/index.vue')['default']
   }
