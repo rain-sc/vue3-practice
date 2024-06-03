@@ -1,12 +1,13 @@
 import type { AxiosResponse, InternalAxiosRequestConfig } from 'axios'
 import axios from 'axios'
-import { ElMessage, ElMessageBox } from 'element-plus'
-import TOKEN_KEY from '@/enums/CaheEnum'
+import { ElMessage } from 'element-plus'
+import { getToken } from './auth'
 import { useUserStoreHook } from '@/store/modules/user'
 import router from '@/router'
 
 function logout() {
   useUserStoreHook().resetToken()
+  router.push('/login')
   window.location.reload()
 }
 
@@ -18,9 +19,9 @@ const service = axios.create({
 
 service.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    const accessToken = useStorage(TOKEN_KEY, '')
-    if (accessToken.value)
-      config.headers.Authorization = `Bearer ${accessToken.value}`
+    const accessToken = getToken()
+    if (accessToken)
+      config.headers.Authorization = `Bearer ${accessToken}`
     return config
   },
   (error: any) => {
@@ -34,19 +35,14 @@ service.interceptors.response.use(
   },
   (error: any) => {
     if (error.response.status === 401) {
-      ElMessageBox.confirm(`You have been logged out, you can cancel to stay on this page, or log in again', 'Confirm logout'`, {
-        confirmButtonText: 'Re-Login',
-        cancelButtonText: 'Cancel',
-        type: 'warning',
+      ElMessage({
+        message: error.response.data.message,
+        type: 'error',
+        duration: 5 * 1000,
       })
-      router.push('/login')
       logout()
+      return Promise.reject(error)
     }
-    ElMessage({
-      message: error.message,
-      type: 'error',
-      duration: 5 * 1000,
-    })
     return Promise.reject(error)
   },
 )
