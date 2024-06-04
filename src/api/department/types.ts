@@ -12,3 +12,16 @@ export interface DepartmentListBaseType {
   name: string
   pid: number
 }
+
+export interface DepartmentHeadListType {
+  id: string
+  username: string
+}
+
+export interface AddDepartmentParamsType {
+  code: string
+  introduce: string
+  managerId: string
+  name: string
+  pid: string
+}

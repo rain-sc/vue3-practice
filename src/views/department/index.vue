@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { getDepartmentListAPI } from '@/api/department'
-import type { DepartmentListType } from '@/api/department/types'
+import { ElMessage } from 'element-plus'
+import { addDepartmentAPI, getDepartmentHeadListAPI, getDepartmentListAPI } from '@/api/department'
+import type { DepartmentHeadListType, DepartmentListType } from '@/api/department/types'
 
 defineOptions({
   name: 'Department',
@@ -12,6 +13,7 @@ const loading = ref<boolean>(false)
 const dialog = reactive({
   title: '',
   visible: false,
+  loading: false,
 })
 const rules = reactive({
   managerId: [
@@ -33,17 +35,10 @@ const rules = reactive({
       message: '部門編碼的長度為2-10個字符',
       trigger: 'blur',
     },
-    // {
-    //   trigger: 'blur',
-    //   validator: async (rule, value, callback) => {
-    //     const result = await getDepartmentList()
-
-    //     if (result.data.data.some(item => item.code === value))
-    //       callback(new Error('部門中已經有該編碼了'))
-    //     else
-    //       callback()
-    //   },
-    // },
+    {
+      trigger: 'blur',
+      validator: checkCodeValid,
+    },
   ],
   name: [
     {
@@ -57,16 +52,10 @@ const rules = reactive({
       message: '部門名稱的長度為2-10個字符',
       trigger: 'blur',
     },
-    // {
-    //   trigger: 'blur',
-    //   validator: async (rule, value, callback) => {
-    //     const result = await getDepartmentList()
-    //     if (result.data.data.some(item => item.name === value))
-    //       callback(new Error('部门中已经有该名称了'))
-    //     else
-    //       callback()
-    //   },
-    // },
+    {
+      trigger: 'blur',
+      validator: checkNameValid,
+    },
   ],
   introduce: [
     {
@@ -85,11 +74,14 @@ const rules = reactive({
 const formData = reactive({
   code: '',
   introduce: '',
-  managerId: 0,
+  managerId: '',
   name: '',
-  pid: 0,
+  pid: '',
 })
 const deptFormRef = ref(ElForm)
+const departmentHeadList = ref<DepartmentHeadListType[]>([])
+const buttionActionType = ref<string>('')
+const currentId = ref<string>('')
 
 async function getDepartmentList() {
   try {
@@ -118,12 +110,15 @@ function transListToTreeData(list: DepartmentListType[], rootValue: number) {
   return treeArray
 }
 
-function openDialog(id: number, type: string) {
+async function openDialog(id: string, type: string) {
+  await getDepartmentHeadList()
   dialog.visible = true
-  if (type === 'add')
+  buttionActionType.value = type
+  currentId.value = id
+  if (buttionActionType.value === 'add')
     dialog.title = '新增子部門'
 
-  else if (type === 'edit')
+  else if (buttionActionType.value === 'edit')
     dialog.title = '編輯部門'
 
   else
@@ -132,18 +127,75 @@ function openDialog(id: number, type: string) {
 
 function closeDialog() {
   dialog.visible = false
+  dialog.loading = false
+  resetForm()
 }
 
 async function handleSubmit() {
+  if (!deptFormRef.value)
+    return
+
+  deptFormRef.value.validate(async (valid: any) => {
+    if (valid) {
+      dialog.loading = true
+      try {
+        if (buttionActionType.value === 'add') {
+          await addDepartmentAPI({ ...formData, pid: currentId.value })
+          ElMessage({ type: 'success', message: '新增成功' })
+        }
+      }
+      catch (error) {
+        console.error(error)
+      }
+      finally {
+        closeDialog()
+        await getDepartmentList()
+      }
+    }
+  })
+}
+
+async function getDepartmentHeadList() {
   try {
-    deptFormRef.value.validate((valid: any) => {
-    })
+    const { data } = await getDepartmentHeadListAPI()
+    departmentHeadList.value = data.data
   }
   catch (error) {
     console.error(error)
   }
 }
 
+function resetForm() {
+  deptFormRef.value.resetFields()
+  deptFormRef.value.clearValidate()
+
+  formData.code = ''
+  formData.introduce = ''
+  formData.managerId = ''
+  formData.name = ''
+  formData.pid = ''
+}
+
+async function validateField(fieldName: string, errorMessage: string, rule: any, value: any, callback: any) {
+  try {
+    const { data } = await getDepartmentListAPI()
+    if (data.data.some((item: any) => item[fieldName] === value))
+      callback(new Error(errorMessage))
+    else
+      callback()
+  }
+  catch (error) {
+    console.error(error)
+  }
+}
+
+async function checkCodeValid(rule: any, value: any, callback: any) {
+  await validateField('code', '部門中已經有該編碼了', rule, value, callback)
+}
+
+async function checkNameValid(rule: any, value: any, callback: any) {
+  await validateField('name', '部門中已經有該名稱了', rule, value, callback)
+}
 onMounted(() => {
   getDepartmentList()
 })
@@ -204,16 +256,27 @@ onMounted(() => {
           <el-input v-model="formData.code" placeholder="2-10個字符" />
         </el-form-item>
         <el-form-item label="部門負責人" prop="managerId">
-          <el-select v-model="formData.managerId" placeholder="請選擇負責人" />
+          <el-select v-model="formData.managerId" placeholder="請選擇負責人">
+            <el-option
+              v-for="item in departmentHeadList"
+              :key="item.id"
+              :label="item.username"
+              :value="item.id"
+            />
+          </el-select>
         </el-form-item>
         <el-form-item label="部門介紹" prop="introduce">
           <el-input v-model="formData.introduce" placeholder="1-100個字符" type="textarea" :rows="4" />
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="handleSubmit">
+          <el-button
+            type="primary"
+            :loading="dialog.loading"
+            @click="handleSubmit"
+          >
             確定
           </el-button>
-          <el-button>
+          <el-button @click="closeDialog">
             取消
           </el-button>
         </el-form-item>
