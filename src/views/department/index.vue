@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ElMessage } from 'element-plus'
-import { addDepartmentAPI, getCurrentDepartmentDetailAPI, getDepartmentHeadListAPI, getDepartmentListAPI } from '@/api/department'
-import type { AddDepartmentParamsType, DepartmentHeadListType, DepartmentListBaseType, DepartmentListType } from '@/api/department/types'
+import { addDepartmentAPI, getDepartmentHeadListAPI, getDepartmentListAPI } from '@/api/department'
+import type { DepartmentListBaseType, DepartmentListType } from '@/api/department/types'
 
 defineOptions({
   name: 'Department',
@@ -71,7 +71,7 @@ const rules = reactive({
     },
   ],
 })
-const formData = reactive<AddDepartmentParamsType>({
+const formData = reactive<DepartmentListBaseType>({
   code: '',
   introduce: '',
   managerId: '',
@@ -79,11 +79,9 @@ const formData = reactive<AddDepartmentParamsType>({
   pid: '',
 })
 const deptFormRef = ref(ElForm)
-const departmentHeadList = ref<DepartmentHeadListType[]>([])
+const departmentHeadList = ref<DepartmentListBaseType[]>([])
 const buttionActionType = ref<string>('')
 const currentId = ref<string>('')
-const dialogRef = ref()
-const formLoading = ref(false)
 
 async function getDepartmentList() {
   try {
@@ -99,12 +97,11 @@ async function getDepartmentList() {
   }
 }
 
-function transListToTreeData(list: DepartmentListType[], parentId: number | string) {
+function transListToTreeData(list: DepartmentListType[], parentId: string | number) {
   const treeArray: DepartmentListType[] = []
-
   list.forEach((item) => {
     if (item.pid === parentId) {
-      const children = transListToTreeData(list, item.id)
+      const children = transListToTreeData(list, item.id!)
       if (children.length)
         item.children = children
       treeArray.push(item)
@@ -113,22 +110,19 @@ function transListToTreeData(list: DepartmentListType[], parentId: number | stri
   return treeArray
 }
 
-async function openDialog(rowData: DepartmentListBaseType, type: string) {
+async function openDialog(id: string, type: string) {
   await getDepartmentHeadList()
   dialog.visible = true
   buttionActionType.value = type
-  const { id } = rowData
   currentId.value = id
-  if (buttionActionType.value === 'add') {
+  if (buttionActionType.value === 'add')
     dialog.title = '新增子部門'
-  }
-  else if (buttionActionType.value === 'edit') {
+
+  else if (buttionActionType.value === 'edit')
     dialog.title = '編輯部門'
-    await getCurrentDepartmentDetail(id)
-  }
-  else {
+
+  else
     dialog.title = '刪除部門'
-  }
 }
 
 function closeDialog() {
@@ -202,20 +196,6 @@ async function checkCodeValid(rule: any, value: any, callback: any) {
 async function checkNameValid(rule: any, value: any, callback: any) {
   await validateField('name', '部門中已經有該名稱了', rule, value, callback)
 }
-
-async function getCurrentDepartmentDetail(id: string) {
-  try {
-    formLoading.value = true
-    const { data } = await getCurrentDepartmentDetailAPI(id)
-    Object.assign(formData, data.data)
-  }
-  catch (error) {
-    console.error(error)
-  }
-  finally {
-    formLoading.value = false
-  }
-}
 onMounted(() => {
   getDepartmentList()
 })
@@ -244,7 +224,6 @@ onMounted(() => {
             </ElButton>
             <ElButton
               type="success"
-              @click.stop="openDialog(scope.row, 'edit')"
             >
               編輯
             </ElButton>
@@ -259,52 +238,49 @@ onMounted(() => {
     </el-card>
 
     <el-dialog
-      ref="dialogRef"
       v-model="dialog.visible"
       :title="dialog.title"
       width="600px"
       @closed="closeDialog"
     >
-      <div v-loading="formLoading">
-        <el-form
-          ref="deptFormRef"
-          :model="formData"
-          :rules="rules"
-          label-width="100px"
-        >
-          <el-form-item prop="name" label="部門名稱">
-            <el-input v-model="formData.name" placeholder="2-10個字符" />
-          </el-form-item>
-          <el-form-item label="部門編碼" prop="code">
-            <el-input v-model="formData.code" placeholder="2-10個字符" />
-          </el-form-item>
-          <el-form-item label="部門負責人" prop="managerId">
-            <el-select v-model="formData.managerId" placeholder="請選擇負責人">
-              <el-option
-                v-for="item in departmentHeadList"
-                :key="item.id"
-                :label="item.username"
-                :value="item.id"
-              />
-            </el-select>
-          </el-form-item>
-          <el-form-item label="部門介紹" prop="introduce">
-            <el-input v-model="formData.introduce" placeholder="1-100個字符" type="textarea" :rows="4" />
-          </el-form-item>
-          <el-form-item>
-            <el-button
-              type="primary"
-              :loading="dialog.loading"
-              @click="handleSubmit"
-            >
-              確定
-            </el-button>
-            <el-button @click="closeDialog">
-              取消
-            </el-button>
-          </el-form-item>
-        </el-form>
-      </div>
+      <el-form
+        ref="deptFormRef"
+        :model="formData"
+        :rules="rules"
+        label-width="100px"
+      >
+        <el-form-item prop="name" label="部門名稱">
+          <el-input v-model="formData.name" placeholder="2-10個字符" />
+        </el-form-item>
+        <el-form-item label="部門編碼" prop="code">
+          <el-input v-model="formData.code" placeholder="2-10個字符" />
+        </el-form-item>
+        <el-form-item label="部門負責人" prop="managerId">
+          <el-select v-model="formData.managerId" placeholder="請選擇負責人">
+            <el-option
+              v-for="item in departmentHeadList"
+              :key="item.id"
+              :label="item.username"
+              :value="item.id!"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="部門介紹" prop="introduce">
+          <el-input v-model="formData.introduce" placeholder="1-100個字符" type="textarea" :rows="4" />
+        </el-form-item>
+        <el-form-item>
+          <el-button
+            type="primary"
+            :loading="dialog.loading"
+            @click="handleSubmit"
+          >
+            確定
+          </el-button>
+          <el-button @click="closeDialog">
+            取消
+          </el-button>
+        </el-form-item>
+      </el-form>
     </el-dialog>
   </div>
 </template>
