@@ -1,6 +1,5 @@
 import type {
   DepartmentListBaseType,
-  DepartmentListType,
 } from './types'
 import { http } from '@/utils/request'
 import type { ResponseData } from '@/types/global'

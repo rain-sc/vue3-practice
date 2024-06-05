@@ -1,7 +1,7 @@
 export interface ResponseData<T> {
   success: boolean
   code: number
-  data: T
+  data?: T
   message: string
 }
 
