@@ -118,8 +118,10 @@ function transListToTreeData(list: DepartmentListType[], parentId: string | numb
 }
 
 async function openDialog(rowData: DepartmentListBaseType, type: string) {
-  await getDepartmentHeadList()
   buttionActionType.value = type
+  if (buttionActionType.value !== 'delete')
+    await getDepartmentHeadList()
+
   currentId.value = rowData.id!
   if (buttionActionType.value === 'add') {
     dialog.visible = true
@@ -129,7 +131,10 @@ async function openDialog(rowData: DepartmentListBaseType, type: string) {
     dialog.title = '編輯部門'
     await getCurrentDepartmentDetail(rowData)
   }
-  else {
+  else if (buttionActionType.value === 'delete') {
+    const res = await currentDepartmentDetailResponse(rowData)
+    if (res === undefined || res === null)
+      return
     ElMessageBox.confirm(
       '您確認要刪除該部門嗎',
       {
@@ -240,19 +245,23 @@ async function checkCodeValid(rule: any, value: any, callback: any) {
 async function checkNameValid(rule: any, value: any, callback: any) {
   await validateField('name', '部門中已經有該名稱了', rule, value, callback)
 }
+async function currentDepartmentDetailResponse(data: DepartmentListBaseType) {
+  const res = await getCurrentDepartmentDetailAPI(data)
+  if (res.data.code === 10000 && res.data.success === false) {
+    ElMessage({ type: 'warning', message: '部門不存在' })
+    dialog.visible = false
+  }
+  return res.data.data
+}
 
 async function getCurrentDepartmentDetail(data: DepartmentListBaseType) {
   try {
-    const res = await getCurrentDepartmentDetailAPI(data)
-    if (res.data.code === 10000 && res.data.success === false) {
-      ElMessage({ type: 'warning', message: '部門不存在' })
-      dialog.visible = false
+    const res = await currentDepartmentDetailResponse(data)
+    if (res === undefined || res === null)
       return
-    }
-
     dialog.visible = true
     dialog.loading = true
-    const resData = res.data.data
+    const resData = res
     Object.assign(formData, resData)
   }
   catch (error) {
