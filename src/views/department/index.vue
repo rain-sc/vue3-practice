@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ElMessage } from 'element-plus'
 import { addDepartmentAPI, getDepartmentHeadListAPI, getDepartmentListAPI } from '@/api/department'
-import type { DepartmentHeadListType, DepartmentListType } from '@/api/department/types'
+import type { AddDepartmentParamsType, DepartmentHeadListType, DepartmentListType } from '@/api/department/types'
 
 defineOptions({
   name: 'Department',
@@ -37,7 +37,7 @@ const rules = reactive({
     },
     {
       trigger: 'blur',
-      validator: checkCodeValid,
+      asyncValidator: checkCodeValid,
     },
   ],
   name: [
@@ -54,7 +54,7 @@ const rules = reactive({
     },
     {
       trigger: 'blur',
-      validator: checkNameValid,
+      asyncValidator: checkNameValid,
     },
   ],
   introduce: [
@@ -71,7 +71,7 @@ const rules = reactive({
     },
   ],
 })
-const formData = reactive({
+const formData = reactive<AddDepartmentParamsType>({
   code: '',
   introduce: '',
   managerId: '',
