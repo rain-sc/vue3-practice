@@ -1,4 +1,9 @@
-import type { AddDepartmentParamsType, DepartmentHeadListType, DepartmentListType } from './types'
+import type {
+  AddDepartmentParamsType,
+  DepartmentHeadListType,
+  DepartmentListBaseType,
+  DepartmentListType,
+} from './types'
 import { http } from '@/utils/request'
 import type { ResponseData } from '@/types/global'
 
@@ -19,5 +24,11 @@ export function addDepartmentAPI(data: AddDepartmentParamsType) {
     url: 'company/department',
     method: 'POST',
     data,
+  })
+}
+
+export function getCurrentDepartmentDetailAPI(id: string) {
+  return http<ResponseData<DepartmentListBaseType>>({
+    url: `company/department/${id}`,
   })
 }

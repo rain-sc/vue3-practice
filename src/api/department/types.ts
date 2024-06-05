@@ -5,12 +5,12 @@ export interface DepartmentListType extends DepartmentListBaseType {
 export interface DepartmentListBaseType {
   code: string
   createTime: string
-  id: number
+  id: string
   introduce: string
-  managerId: number
+  managerId: string
   managerName: string
   name: string
-  pid: number
+  pid: string
 }
 
 export interface DepartmentHeadListType {
