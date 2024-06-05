@@ -133,16 +133,17 @@ async function openDialog(rowData: DepartmentListBaseType, type: string) {
   }
   else if (buttionActionType.value === 'delete') {
     const res = await currentDepartmentDetailResponse(rowData)
-    if (res === undefined || res === null)
+    if (!res)
       return
-    ElMessageBox.confirm(
-      '您確認要刪除該部門嗎',
-      {
-        confirmButtonText: 'OK',
-        cancelButtonText: 'Cancel',
-        type: 'warning',
-      },
-    ).then(async () => {
+    try {
+      await ElMessageBox.confirm(
+        '您確認要刪除該部門嗎',
+        {
+          confirmButtonText: '確定',
+          cancelButtonText: '取消',
+          type: 'warning',
+        },
+      )
       const res = await deleteCurrentDepartmentAPI(rowData)
       if (res.data.code === 40001) {
         dialog.visible = false
@@ -151,14 +152,18 @@ async function openDialog(rowData: DepartmentListBaseType, type: string) {
           message: '刪除部門失敗：部門資訊已不存在',
         })
       }
+      if (res.data.code === 50001) {
+        ElMessage({ type: 'error', message: '初始化資料不可以刪除修改,請選擇其他資料操作' })
+        return
+      }
       ElMessage({
         type: 'success',
         message: '刪除部門成功',
       })
-    })
-      .catch((error) => {
-        console.error(error)
-      })
+    }
+    catch (error) {
+      console.error(error)
+    }
   }
 }
 
@@ -247,9 +252,10 @@ async function checkNameValid(rule: any, value: any, callback: any) {
 }
 async function currentDepartmentDetailResponse(data: DepartmentListBaseType) {
   const res = await getCurrentDepartmentDetailAPI(data)
-  if (res.data.code === 10000 && res.data.success === false) {
+  if (res.data.code === 10000 && !res.data.success) {
     ElMessage({ type: 'warning', message: '部門不存在' })
     dialog.visible = false
+    return null
   }
   return res.data.data
 }
@@ -257,7 +263,7 @@ async function currentDepartmentDetailResponse(data: DepartmentListBaseType) {
 async function getCurrentDepartmentDetail(data: DepartmentListBaseType) {
   try {
     const res = await currentDepartmentDetailResponse(data)
-    if (res === undefined || res === null)
+    if (!res)
       return
     dialog.visible = true
     dialog.loading = true
