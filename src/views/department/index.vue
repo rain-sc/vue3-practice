@@ -118,8 +118,10 @@ function transListToTreeData(list: DepartmentListType[], parentId: string | numb
 async function openDialog(rowData: DepartmentListBaseType, type: string) {
   try {
     buttionActionType.value = type
-    dialog.visible = true
-    dialog.loading = true
+    if (buttionActionType.value !== 'delete') {
+      dialog.visible = true
+      dialog.loading = true
+    }
     if (!await currentDepartmentDetailResponse(rowData))
       return
 
@@ -128,7 +130,6 @@ async function openDialog(rowData: DepartmentListBaseType, type: string) {
 
     switch (type) {
       case 'add':
-      // dialog.visible = true
         dialog.title = '新增子部門'
         break
       case 'edit':
@@ -142,6 +143,7 @@ async function openDialog(rowData: DepartmentListBaseType, type: string) {
             cancelButtonText: '取消',
             type: 'warning',
           })
+          loading.value = true
           const res = await deleteCurrentDepartmentAPI(rowData)
           handleResponseMessage(res.data)
           ElMessage({ type: 'success', message: '刪除部門成功' })
