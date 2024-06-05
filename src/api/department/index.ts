@@ -38,3 +38,10 @@ export function editCurrentDepartmentAPI(data: DepartmentListBaseType) {
     data,
   })
 }
+
+export function deleteCurrentDepartmentAPI(data: DepartmentListBaseType) {
+  return http<ResponseData<DepartmentListBaseType>>({
+    url: `company/department/${data.id}`,
+    method: 'DELETE',
+  })
+}

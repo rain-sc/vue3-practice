@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import {
   addDepartmentAPI,
+  deleteCurrentDepartmentAPI,
   editCurrentDepartmentAPI,
   getCurrentDepartmentDetailAPI,
   getDepartmentHeadListAPI,
@@ -118,10 +119,10 @@ function transListToTreeData(list: DepartmentListType[], parentId: string | numb
 
 async function openDialog(rowData: DepartmentListBaseType, type: string) {
   await getDepartmentHeadList()
-  dialog.visible = true
   buttionActionType.value = type
   currentId.value = rowData.id!
   if (buttionActionType.value === 'add') {
+    dialog.visible = true
     dialog.title = '新增子部門'
   }
   else if (buttionActionType.value === 'edit') {
@@ -129,7 +130,30 @@ async function openDialog(rowData: DepartmentListBaseType, type: string) {
     await getCurrentDepartmentDetail(rowData)
   }
   else {
-    dialog.title = '刪除部門'
+    ElMessageBox.confirm(
+      '您確認要刪除該部門嗎',
+      {
+        confirmButtonText: 'OK',
+        cancelButtonText: 'Cancel',
+        type: 'warning',
+      },
+    ).then(async () => {
+      const res = await deleteCurrentDepartmentAPI(rowData)
+      if (res.data.code === 40001) {
+        dialog.visible = false
+        ElMessage({
+          type: 'warning',
+          message: '刪除部門失敗：部門資訊已不存在',
+        })
+      }
+      ElMessage({
+        type: 'success',
+        message: '刪除部門成功',
+      })
+    })
+      .catch((error) => {
+        console.error(error)
+      })
   }
 }
 
@@ -219,8 +243,15 @@ async function checkNameValid(rule: any, value: any, callback: any) {
 
 async function getCurrentDepartmentDetail(data: DepartmentListBaseType) {
   try {
-    dialog.loading = true
     const res = await getCurrentDepartmentDetailAPI(data)
+    if (res.data.code === 10000 && res.data.success === false) {
+      ElMessage({ type: 'warning', message: '部門不存在' })
+      dialog.visible = false
+      return
+    }
+
+    dialog.visible = true
+    dialog.loading = true
     const resData = res.data.data
     Object.assign(formData, resData)
   }
@@ -231,6 +262,7 @@ async function getCurrentDepartmentDetail(data: DepartmentListBaseType) {
     dialog.loading = false
   }
 }
+
 onMounted(() => {
   getDepartmentList()
 })
@@ -265,6 +297,7 @@ onMounted(() => {
             </ElButton>
             <ElButton
               type="danger"
+              @click.stop="openDialog(scope.row, 'delete')"
             >
               刪除
             </ElButton>
