@@ -1,6 +1,4 @@
 import type {
-  AddDepartmentParamsType,
-  DepartmentHeadListType,
   DepartmentListBaseType,
   DepartmentListType,
 } from './types'
@@ -14,12 +12,12 @@ export function getDepartmentListAPI() {
 }
 
 export function getDepartmentHeadListAPI() {
-  return http<ResponseData<DepartmentHeadListType[]>>({
+  return http<ResponseData<DepartmentListBaseType[]>>({
     url: 'sys/user/simple',
   })
 }
 
-export function addDepartmentAPI(data: AddDepartmentParamsType) {
+export function addDepartmentAPI(data: DepartmentListBaseType) {
   return http({
     url: 'company/department',
     method: 'POST',
@@ -27,8 +25,8 @@ export function addDepartmentAPI(data: AddDepartmentParamsType) {
   })
 }
 
-export function getCurrentDepartmentDetailAPI(id: string) {
+export function getCurrentDepartmentDetailAPI(data: DepartmentListBaseType) {
   return http<ResponseData<DepartmentListBaseType>>({
-    url: `company/department/${id}`,
+    url: `company/department/${data.id}`,
   })
 }

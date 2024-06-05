@@ -1,6 +1,11 @@
 <script setup lang="ts">
 import { ElMessage } from 'element-plus'
-import { addDepartmentAPI, getDepartmentHeadListAPI, getDepartmentListAPI } from '@/api/department'
+import {
+  addDepartmentAPI,
+  getCurrentDepartmentDetailAPI,
+  getDepartmentHeadListAPI,
+  getDepartmentListAPI,
+} from '@/api/department'
 import type { DepartmentListBaseType, DepartmentListType } from '@/api/department/types'
 
 defineOptions({
@@ -110,19 +115,21 @@ function transListToTreeData(list: DepartmentListType[], parentId: string | numb
   return treeArray
 }
 
-async function openDialog(id: string, type: string) {
+async function openDialog(rowData: DepartmentListBaseType, type: string) {
   await getDepartmentHeadList()
   dialog.visible = true
   buttionActionType.value = type
-  currentId.value = id
-  if (buttionActionType.value === 'add')
+  currentId.value = rowData.id!
+  if (buttionActionType.value === 'add') {
     dialog.title = '新增子部門'
-
-  else if (buttionActionType.value === 'edit')
+  }
+  else if (buttionActionType.value === 'edit') {
     dialog.title = '編輯部門'
-
-  else
+    await getCurrentDepartmentDetail(rowData)
+  }
+  else {
     dialog.title = '刪除部門'
+  }
 }
 
 function closeDialog() {
@@ -196,6 +203,21 @@ async function checkCodeValid(rule: any, value: any, callback: any) {
 async function checkNameValid(rule: any, value: any, callback: any) {
   await validateField('name', '部門中已經有該名稱了', rule, value, callback)
 }
+
+async function getCurrentDepartmentDetail(data: DepartmentListBaseType) {
+  try {
+    dialog.loading = true
+    const res = await getCurrentDepartmentDetailAPI(data)
+    const resData = res.data.data
+    Object.assign(formData, resData)
+  }
+  catch (error) {
+    console.error(error)
+  }
+  finally {
+    dialog.loading = false
+  }
+}
 onMounted(() => {
   getDepartmentList()
 })
@@ -218,12 +240,13 @@ onMounted(() => {
           <template #default="scope">
             <ElButton
               type="primary"
-              @click.stop="openDialog(scope.row.id, 'add')"
+              @click.stop="openDialog(scope.row, 'add')"
             >
               新增
             </ElButton>
             <ElButton
               type="success"
+              @click.stop="openDialog(scope.row, 'edit')"
             >
               編輯
             </ElButton>
@@ -243,44 +266,46 @@ onMounted(() => {
       width="600px"
       @closed="closeDialog"
     >
-      <el-form
-        ref="deptFormRef"
-        :model="formData"
-        :rules="rules"
-        label-width="100px"
-      >
-        <el-form-item prop="name" label="部門名稱">
-          <el-input v-model="formData.name" placeholder="2-10個字符" />
-        </el-form-item>
-        <el-form-item label="部門編碼" prop="code">
-          <el-input v-model="formData.code" placeholder="2-10個字符" />
-        </el-form-item>
-        <el-form-item label="部門負責人" prop="managerId">
-          <el-select v-model="formData.managerId" placeholder="請選擇負責人">
-            <el-option
-              v-for="item in departmentHeadList"
-              :key="item.id"
-              :label="item.username"
-              :value="item.id!"
-            />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="部門介紹" prop="introduce">
-          <el-input v-model="formData.introduce" placeholder="1-100個字符" type="textarea" :rows="4" />
-        </el-form-item>
-        <el-form-item>
-          <el-button
-            type="primary"
-            :loading="dialog.loading"
-            @click="handleSubmit"
-          >
-            確定
-          </el-button>
-          <el-button @click="closeDialog">
-            取消
-          </el-button>
-        </el-form-item>
-      </el-form>
+      <div v-loading=" dialog.loading">
+        <el-form
+          ref="deptFormRef"
+          :model="formData"
+          :rules="rules"
+          label-width="100px"
+        >
+          <el-form-item prop="name" label="部門名稱">
+            <el-input v-model="formData.name" placeholder="2-10個字符" />
+          </el-form-item>
+          <el-form-item label="部門編碼" prop="code">
+            <el-input v-model="formData.code" placeholder="2-10個字符" />
+          </el-form-item>
+          <el-form-item label="部門負責人" prop="managerId">
+            <el-select v-model="formData.managerId" placeholder="請選擇負責人">
+              <el-option
+                v-for="item in departmentHeadList"
+                :key="item.id"
+                :label="item.username"
+                :value="item.id!"
+              />
+            </el-select>
+          </el-form-item>
+          <el-form-item label="部門介紹" prop="introduce">
+            <el-input v-model="formData.introduce" placeholder="1-100個字符" type="textarea" :rows="4" />
+          </el-form-item>
+          <el-form-item>
+            <el-button
+              type="primary"
+              :loading="dialog.loading"
+              @click="handleSubmit"
+            >
+              確定
+            </el-button>
+            <el-button @click="closeDialog">
+              取消
+            </el-button>
+          </el-form-item>
+        </el-form>
+      </div>
     </el-dialog>
   </div>
 </template>
