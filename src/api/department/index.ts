@@ -6,7 +6,7 @@ import { http } from '@/utils/request'
 import type { ResponseData } from '@/types/global'
 
 export function getDepartmentListAPI() {
-  return http<ResponseData<DepartmentListType[]>>({
+  return http<ResponseData<DepartmentListBaseType[]>>({
     url: 'company/department',
   })
 }
@@ -28,5 +28,13 @@ export function addDepartmentAPI(data: DepartmentListBaseType) {
 export function getCurrentDepartmentDetailAPI(data: DepartmentListBaseType) {
   return http<ResponseData<DepartmentListBaseType>>({
     url: `company/department/${data.id}`,
+  })
+}
+
+export function editCurrentDepartmentAPI(data: DepartmentListBaseType) {
+  return http<ResponseData<DepartmentListBaseType>>({
+    url: `company/department/${data.id}`,
+    method: 'PUT',
+    data,
   })
 }

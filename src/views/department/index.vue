@@ -2,6 +2,7 @@
 import { ElMessage } from 'element-plus'
 import {
   addDepartmentAPI,
+  editCurrentDepartmentAPI,
   getCurrentDepartmentDetailAPI,
   getDepartmentHeadListAPI,
   getDepartmentListAPI,
@@ -150,6 +151,14 @@ async function handleSubmit() {
           await addDepartmentAPI({ ...formData, pid: currentId.value })
           ElMessage({ type: 'success', message: '新增成功' })
         }
+        else if (buttionActionType.value === 'edit') {
+          const res = await editCurrentDepartmentAPI(formData)
+          if (res.data.code === 50001) {
+            ElMessage({ type: 'error', message: '初始化資料不可以刪除修改,請選擇其他資料操作' })
+            return
+          }
+          ElMessage({ type: 'success', message: '編輯成功' })
+        }
       }
       catch (error) {
         console.error(error)
@@ -185,8 +194,12 @@ function resetForm() {
 
 async function validateField(fieldName: string, errorMessage: string, rule: any, value: any, callback: any) {
   try {
-    const { data } = await getDepartmentListAPI()
-    if (data.data.some((item: any) => item[fieldName] === value))
+    const res = await getDepartmentListAPI()
+    let resData = res.data.data
+    if (formData.id)
+      resData = resData.filter(item => item.id !== formData.id)
+
+    if (resData.some((item: any) => item[fieldName] === value))
       callback(new Error(errorMessage))
     else
       callback()

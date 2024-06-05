@@ -43,6 +43,7 @@ service.interceptors.response.use(
       logout()
       return Promise.reject(error)
     }
+
     return Promise.reject(error)
   },
 )
