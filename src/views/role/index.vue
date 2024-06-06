@@ -8,7 +8,7 @@ defineOptions({
   name: 'Role',
   inheritAttrs: false,
 })
-const tableQueryParams = reactive<RoleListParamsType>({
+const roleParams = reactive<RoleListParamsType>({
   page: 1,
   pagesize: 10,
   total: 0,
@@ -48,10 +48,10 @@ const buttonActionType = ref<string>('')
 async function getRoleList() {
   loading.value = true
   try {
-    const res = await getRoleListAPI(tableQueryParams)
+    const res = await getRoleListAPI(roleParams)
     const resData = res.data.data
     roleList.value = resData!.rows
-    Object.assign(tableQueryParams, { total: resData!.total })
+    Object.assign(roleParams, { total: resData!.total })
   }
   catch (error) {
     console.error(error)
@@ -253,10 +253,10 @@ onMounted(() => {
           </el-table-column>
         </el-table>
         <pagination
-          v-if="tableQueryParams.total > 0"
-          v-model:total="tableQueryParams.total"
-          v-model:page="tableQueryParams.page"
-          v-model:limit="tableQueryParams.pagesize"
+          v-if="roleParams.total > 0"
+          v-model:total="roleParams.total"
+          v-model:page="roleParams.page"
+          v-model:limit="roleParams.pagesize"
           layout="prev, pager, next"
           @pagination="getRoleList"
         />
