@@ -1,6 +1,6 @@
 import type { AxiosResponse, InternalAxiosRequestConfig } from 'axios'
 import axios from 'axios'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import { getToken } from './auth'
 import { useUserStoreHook } from '@/store/modules/user'
 import router from '@/router'
@@ -8,7 +8,6 @@ import router from '@/router'
 function logout() {
   useUserStoreHook().resetToken()
   router.push('/login')
-  window.location.reload()
 }
 
 const service = axios.create({
@@ -34,16 +33,19 @@ service.interceptors.response.use(
     return response
   },
   (error: any) => {
-    if (error.response.status === 401) {
-      ElMessage({
-        message: error.response.data.message,
-        type: 'error',
-        duration: 5 * 1000,
+    const { code, success } = error.response.data
+    if (code === 10002 && !success) {
+      ElMessageBox.confirm('當前頁面已失效，請重新登入', '提示', {
+        confirmButtonText: '確定',
+        cancelButtonText: '取消',
+        type: 'warning',
+      }).then(() => {
+        logout()
       })
-      logout()
-      return Promise.reject(error)
     }
-
+    else {
+      ElMessage.error('系统出错')
+    }
     return Promise.reject(error)
   },
 )
