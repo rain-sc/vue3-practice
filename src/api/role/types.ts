@@ -8,6 +8,7 @@ export interface RoleItemType {
   name?: string
   description?: string
   state?: number
+  permIds?: []
 }
 
 export interface RoleListParamsType {

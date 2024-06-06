@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ElMessage } from 'element-plus'
-import { addRoleAPI, getRoleListAPI } from '@/api/role'
+import { addRoleAPI, getCurrentRoleDetailAPI, getRoleListAPI } from '@/api/role'
 import type { RoleItemType, RoleListParamsType } from '@/api/role/types'
 import { State } from '@/enums/TableEnum'
 
@@ -43,6 +43,8 @@ const rules = reactive({
     },
   ],
 })
+const buttonActionType = ref<string>('')
+
 async function getRoleList() {
   loading.value = true
   try {
@@ -63,28 +65,21 @@ function openMenuDialog() {
 
 }
 
-function openDialog(roleId?: number) {
-  dialog.visible = true
-  try {
-    dialog.loading = true
-    if (roleId) {
-      dialog.title = '修改角色'
-      try {
-        // todo
-      }
-      catch (error) {
-        console.error(error)
-      }
-    }
-    else {
-      dialog.title = '新增角色'
-    }
+async function openDialog(actionType: string, data: RoleItemType) {
+  buttonActionType.value = actionType
+
+  if (buttonActionType.value !== 'add') {
+    const resData = await getCurrentRoleDetail(data)
+    if (!resData)
+      return
   }
-  catch (error) {
-    console.error(error)
+
+  if (data.id) {
+    dialog.title = '修改角色'
   }
-  finally {
-    dialog.loading = false
+  else {
+    dialog.visible = true
+    dialog.title = '新增角色'
   }
 }
 
@@ -94,6 +89,7 @@ function handleDelete() {
 
 function closeDialog() {
   dialog.visible = false
+  dialog.title = ''
   resetForm()
 }
 
@@ -105,6 +101,8 @@ function resetForm() {
     name: '',
     state: 0,
     description: '',
+    id: '',
+    permIds: [],
   })
 }
 
@@ -140,6 +138,27 @@ async function handleSubmit() {
   }
 }
 
+async function getCurrentRoleDetail(data: RoleItemType) {
+  dialog.visible = true
+  dialog.loading = true
+  try {
+    const res = await getCurrentRoleDetailAPI(data)
+    const resData = res.data
+    if (!resData.success && resData.code === 10000) {
+      ElMessage({ type: 'error', message: '查詢角色詳情失敗' })
+      return null
+    }
+    Object.assign(formData, { ...resData.data })
+    return resData
+  }
+  catch (error) {
+    console.error(error)
+  }
+  finally {
+    dialog.loading = false
+  }
+}
+
 onMounted(() => {
   getRoleList()
 })
@@ -150,7 +169,7 @@ onMounted(() => {
     <div class="app-container">
       <el-card shadow="never" class="table-container">
         <template #header>
-          <el-button type="primary" @click="openDialog()">
+          <el-button type="primary" @click="openDialog('add', {})">
             <el-icon><Plus /></el-icon>新增角色
           </el-button>
         </template>
@@ -188,7 +207,7 @@ onMounted(() => {
                 type="primary"
                 size="small"
                 link
-                @click="openDialog(scope.row.id)"
+                @click="openDialog('edit', scope.row)"
               >
                 <el-icon><Edit /></el-icon>编辑
               </el-button>

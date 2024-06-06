@@ -88,7 +88,7 @@ const formData = reactive<DepartmentListBaseType>({
 })
 const deptFormRef = ref(ElForm)
 const departmentHeadList = ref<DepartmentListBaseType[]>([])
-const buttionActionType = ref<string>('')
+const buttonActionType = ref<string>('')
 const currentId = ref<string>('')
 
 async function getDepartmentList() {
@@ -117,9 +117,9 @@ function transListToTreeData(list: DepartmentListType[], parentId: string | numb
 
 async function openDialog(rowData: DepartmentListBaseType, type: string) {
   try {
-    buttionActionType.value = type
+    buttonActionType.value = type
 
-    if (buttionActionType.value !== 'delete') {
+    if (buttonActionType.value !== 'delete') {
       dialog.visible = true
       dialog.loading = true
     }
@@ -190,7 +190,7 @@ async function handleSubmit() {
 
     const isValid = await validateForm()
     if (isValid) {
-      const action = buttionActionType.value === 'add'
+      const action = buttonActionType.value === 'add'
         ? addDepartmentAPI({ ...formData, pid: currentId.value })
         : editCurrentDepartmentAPI(formData)
 
@@ -200,7 +200,7 @@ async function handleSubmit() {
       if (res.data.code === 10000 && res.data.success) {
         ElMessage({
           type: 'success',
-          message: buttionActionType.value === 'add' ? '新增成功' : '編輯成功',
+          message: buttonActionType.value === 'add' ? '新增成功' : '編輯成功',
         })
       }
 

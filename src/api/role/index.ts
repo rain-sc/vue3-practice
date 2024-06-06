@@ -16,3 +16,9 @@ export function addRoleAPI(data: RoleItemType) {
     data,
   })
 }
+
+export function getCurrentRoleDetailAPI(data: RoleItemType) {
+  return http<ResponseData<RoleItemType>>({
+    url: `sys/role/${data.id}`,
+  })
+}
