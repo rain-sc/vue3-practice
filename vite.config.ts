@@ -10,6 +10,7 @@ import Components from 'unplugin-vue-components/vite'
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
 import { createSvgIconsPlugin } from 'vite-plugin-svg-icons'
 import UnoCSS from 'unocss/vite'
+import IconsResolver from 'unplugin-icons/resolver'
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
@@ -35,7 +36,7 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
           /\.vue\??/,
         ],
         imports: ['vue', '@vueuse/core', 'pinia', 'vue-router'],
-        resolvers: [ElementPlusResolver()],
+        resolvers: [ElementPlusResolver(), IconsResolver({})],
         dts: true,
         vueTemplate: true,
         eslintrc: {
@@ -45,7 +46,12 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
         },
       }),
       Components({
-        resolvers: [ElementPlusResolver()],
+        resolvers: [
+          ElementPlusResolver(),
+          IconsResolver({
+            enabledCollections: ['ep'],
+          }),
+        ],
         dirs: ['src/components', 'src/**/components'],
       }),
       createSvgIconsPlugin({

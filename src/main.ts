@@ -13,9 +13,9 @@ import 'uno.css'
 import 'animate.css'
 
 const app = createApp(App)
-
 for (const [key, component] of Object.entries(ElementPlusIconsVue))
   app.component(key, component)
+
 app.use(store).use(router).use(ElementPlus)
 
 app.mount('#app')

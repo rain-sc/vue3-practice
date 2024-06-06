@@ -10,6 +10,6 @@ export interface RoleItemType {
 }
 
 export interface RoleListParamsType {
-  page: string
-  pagesize: string
+  page: number
+  pagesize: number
 }
