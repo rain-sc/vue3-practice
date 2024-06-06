@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { getRoleListAPI } from '@/api/role'
+import { ElMessage } from 'element-plus'
+import { addRoleAPI, getRoleListAPI } from '@/api/role'
 import type { RoleItemType, RoleListParamsType } from '@/api/role/types'
 import { State } from '@/enums/TableEnum'
 
@@ -92,16 +93,51 @@ function handleDelete() {
 }
 
 function closeDialog() {
-
+  dialog.visible = false
+  resetForm()
 }
 
 function resetForm() {
   roleFormRef.value.resetFields()
   roleFormRef.value.clearValidate()
 
-  formData.id = undefined
-  formData.sort = 1
-  formData.status = 1
+  Object.assign(formData, {
+    name: '',
+    state: 0,
+    description: '',
+  })
+}
+
+async function handleSubmit() {
+  if (!roleFormRef.value)
+    return
+  try {
+    dialog.loading = true
+    const validateForm = () => new Promise((resolve) => {
+      roleFormRef.value.validate((valid: any) => {
+        resolve(valid)
+      })
+    })
+    const isValid = await validateForm()
+    if (isValid) {
+      const roleId = formData.id
+      if (roleId) {
+        ElMessage.success('修改成功')
+      }
+      else {
+        await addRoleAPI(formData)
+        ElMessage.success('新增成功')
+      }
+    }
+  }
+  catch (error) {
+    console.error(error)
+  }
+  finally {
+    dialog.loading = false
+    getRoleList()
+    closeDialog()
+  }
 }
 
 onMounted(() => {
@@ -206,19 +242,17 @@ onMounted(() => {
                   :rows="5"
                   style="width:300px"
                   resize="none"
+                  placeholder="請輸入角色描述"
                 />
               </el-form-item>
-
-              <template #footer>
-                <div class="dialog-footer">
-                  <el-button type="primary" @click="handleSubmit">
-                    確定
-                  </el-button>
-                  <el-button @click="closeDialog">
-                    取消
-                  </el-button>
-                </div>
-              </template>
+              <div class="dialog-footer text-end">
+                <el-button type="primary" @click="handleSubmit">
+                  確定
+                </el-button>
+                <el-button @click="closeDialog">
+                  取消
+                </el-button>
+              </div>
             </el-form>
           </div>
         </el-dialog>
