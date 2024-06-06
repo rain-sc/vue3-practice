@@ -103,6 +103,9 @@ async function handleDelete(data: RoleItemType) {
   catch (error) {
     console.error(error)
   }
+  finally {
+    closeDialog()
+  }
 }
 
 function closeDialog() {
