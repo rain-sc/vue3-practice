@@ -10,19 +10,45 @@ defineOptions({
 const tableQueryParams = reactive<RoleListParamsType>({
   page: 1,
   pagesize: 10,
+  total: 0,
 })
 const roleList = ref<RoleItemType[]>([])
 const loading = ref(false)
 const roleTableRef = ref(ElForm)
-const listTotal = ref<number>(0)
-
+const dialog = reactive ({
+  visible: false,
+  title: '',
+  loading: false,
+})
+const formData = reactive<RoleItemType>({
+  name: '',
+  state: 0,
+  description: '',
+})
+const roleFormRef = ref(ElForm)
+const rules = reactive({
+  name: [
+    {
+      required: true,
+      message: '角色名稱不能為空',
+      trigger: 'blur',
+    },
+  ],
+  description: [
+    {
+      required: true,
+      message: '角色描述不能為空',
+      trigger: 'blur',
+    },
+  ],
+})
 async function getRoleList() {
   loading.value = true
   try {
     const res = await getRoleListAPI(tableQueryParams)
     const resData = res.data.data
     roleList.value = resData!.rows
-    listTotal.value = resData!.total
+    Object.assign(tableQueryParams, { total: resData!.total })
   }
   catch (error) {
     console.error(error)
@@ -36,12 +62,46 @@ function openMenuDialog() {
 
 }
 
-function openDialog() {
-
+function openDialog(roleId?: number) {
+  dialog.visible = true
+  try {
+    dialog.loading = true
+    if (roleId) {
+      dialog.title = '修改角色'
+      try {
+        // todo
+      }
+      catch (error) {
+        console.error(error)
+      }
+    }
+    else {
+      dialog.title = '新增角色'
+    }
+  }
+  catch (error) {
+    console.error(error)
+  }
+  finally {
+    dialog.loading = false
+  }
 }
 
 function handleDelete() {
 
+}
+
+function closeDialog() {
+
+}
+
+function resetForm() {
+  roleFormRef.value.resetFields()
+  roleFormRef.value.clearValidate()
+
+  formData.id = undefined
+  formData.sort = 1
+  formData.status = 1
 }
 
 onMounted(() => {
@@ -53,6 +113,11 @@ onMounted(() => {
   <div class="container">
     <div class="app-container">
       <el-card shadow="never" class="table-container">
+        <template #header>
+          <el-button type="primary" @click="openDialog()">
+            <el-icon><Plus /></el-icon>新增角色
+          </el-button>
+        </template>
         <el-table
           ref="roleTableRef"
           v-loading="loading"
@@ -81,7 +146,7 @@ onMounted(() => {
                 link
                 @click="openMenuDialog(scope.row)"
               >
-                <el-icon><Position /></el-icon>分配权限
+                <el-icon><Position /></el-icon>分配權限
               </el-button>
               <el-button
                 type="primary"
@@ -103,13 +168,60 @@ onMounted(() => {
           </el-table-column>
         </el-table>
         <pagination
-          v-if="listTotal > 0"
-          v-model:total="listTotal"
+          v-if="tableQueryParams.total > 0"
+          v-model:total="tableQueryParams.total"
           v-model:page="tableQueryParams.page"
           v-model:limit="tableQueryParams.pagesize"
-          layout="total, prev, pager, next"
+          layout="prev, pager, next"
           @pagination="getRoleList"
         />
+
+        <el-dialog
+          v-model="dialog.visible"
+          :title="dialog.title"
+          width="500px"
+          @close="closeDialog"
+        >
+          <div v-loading="dialog.loading">
+            <el-form
+              ref="roleFormRef"
+              :model="formData"
+              :rules="rules"
+              label-width="100px"
+            >
+              <el-form-item label="角色名稱" prop="name">
+                <el-input v-model="formData.name" placeholder="請輸入角色名稱" />
+              </el-form-item>
+              <el-form-item label="啟用" prop="state">
+                <el-switch
+                  v-model="formData.state"
+                  :active-value="State.ENABLED"
+                  :inactive-value="State.DISABLED"
+                />
+              </el-form-item>
+              <el-form-item prop="description" label="角色描述">
+                <el-input
+                  v-model="formData.description"
+                  type="textarea"
+                  :rows="5"
+                  style="width:300px"
+                  resize="none"
+                />
+              </el-form-item>
+
+              <template #footer>
+                <div class="dialog-footer">
+                  <el-button type="primary" @click="handleSubmit">
+                    確定
+                  </el-button>
+                  <el-button @click="closeDialog">
+                    取消
+                  </el-button>
+                </div>
+              </template>
+            </el-form>
+          </div>
+        </el-dialog>
       </el-card>
     </div>
   </div>

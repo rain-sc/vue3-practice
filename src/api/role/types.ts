@@ -4,12 +4,14 @@ export interface RoleListBaseType {
 }
 
 export interface RoleItemType {
-  id: string
-  name: string
-  description: string
+  id?: string
+  name?: string
+  description?: string
+  state?: number
 }
 
 export interface RoleListParamsType {
   page: number
   pagesize: number
+  total: number
 }
