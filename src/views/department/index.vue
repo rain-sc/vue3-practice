@@ -118,15 +118,19 @@ function transListToTreeData(list: DepartmentListType[], parentId: string | numb
 async function openDialog(rowData: DepartmentListBaseType, type: string) {
   try {
     buttionActionType.value = type
+
     if (buttionActionType.value !== 'delete') {
       dialog.visible = true
       dialog.loading = true
     }
-    if (!await currentDepartmentDetailResponse(rowData))
+
+    const isCurrentDepartmentDetailLoaded = await currentDepartmentDetailResponse(rowData)
+    if (!isCurrentDepartmentDetailLoaded)
       return
 
     await getDepartmentHeadList()
-    currentId.value = rowData.id!
+
+    currentId.value = rowData.id!.toString()
 
     switch (type) {
       case 'add':
@@ -137,23 +141,7 @@ async function openDialog(rowData: DepartmentListBaseType, type: string) {
         await getCurrentDepartmentDetail(rowData)
         break
       case 'delete':
-        try {
-          await ElMessageBox.confirm('您確認要刪除該部門嗎', {
-            confirmButtonText: '確定',
-            cancelButtonText: '取消',
-            type: 'warning',
-          })
-          loading.value = true
-          const res = await deleteCurrentDepartmentAPI(rowData)
-          handleResponseMessage(res.data)
-          ElMessage({ type: 'success', message: '刪除部門成功' })
-        }
-        catch (error) {
-          console.error(error)
-        }
-        finally {
-          await getDepartmentList()
-        }
+        await handleDeleteDepartment(rowData)
         break
     }
   }
@@ -183,40 +171,48 @@ function handleResponseMessage(res: ResponseData<DepartmentListBaseType>) {
 function closeDialog() {
   dialog.visible = false
   dialog.loading = false
+  dialog.title = ''
   resetForm()
 }
 
 async function handleSubmit() {
   if (!deptFormRef.value)
     return
+
   try {
     dialog.loading = true
-    deptFormRef.value.validate(async (valid: any) => {
-      if (valid) {
-        try {
-          const action = buttionActionType.value === 'add'
-            ? addDepartmentAPI({ ...formData, pid: currentId.value })
-            : editCurrentDepartmentAPI(formData)
-          const res = await action
-          handleResponseMessage(res.data)
-          if (res.data.code === 10000 && res.data.success)
-            ElMessage({ type: 'success', message: buttionActionType.value === 'add' ? '新增成功' : '編輯成功' })
-        }
-        catch (error) {
-          console.error(error)
-        }
-        finally {
-          closeDialog()
-          await getDepartmentList()
-        }
-      }
+
+    const validateForm = () => new Promise((resolve) => {
+      deptFormRef.value.validate((valid: any) => {
+        resolve(valid)
+      })
     })
+
+    const isValid = await validateForm()
+    if (isValid) {
+      const action = buttionActionType.value === 'add'
+        ? addDepartmentAPI({ ...formData, pid: currentId.value })
+        : editCurrentDepartmentAPI(formData)
+
+      const res = await action
+      handleResponseMessage(res.data)
+
+      if (res.data.code === 10000 && res.data.success) {
+        ElMessage({
+          type: 'success',
+          message: buttionActionType.value === 'add' ? '新增成功' : '編輯成功',
+        })
+      }
+
+      closeDialog()
+      await getDepartmentList()
+    }
   }
   catch (error) {
     console.error(error)
   }
   finally {
-    dialog.loading = true
+    dialog.loading = false
   }
 }
 
@@ -278,6 +274,27 @@ async function getCurrentDepartmentDetail(data: DepartmentListBaseType) {
   }
   finally {
     dialog.loading = false
+  }
+}
+
+async function handleDeleteDepartment(rowData: DepartmentListBaseType) {
+  try {
+    await ElMessageBox.confirm('您確認要刪除該部門嗎', {
+      confirmButtonText: '確定',
+      cancelButtonText: '取消',
+      type: 'warning',
+    })
+
+    loading.value = true
+    const res = await deleteCurrentDepartmentAPI(rowData)
+    handleResponseMessage(res.data)
+    ElMessage({ type: 'success', message: '刪除部門成功' })
+  }
+  catch (error) {
+    console.error(error)
+  }
+  finally {
+    await getDepartmentList()
   }
 }
 
