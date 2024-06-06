@@ -22,3 +22,18 @@ export function getCurrentRoleDetailAPI(data: RoleItemType) {
     url: `sys/role/${data.id}`,
   })
 }
+
+export function editCurrentRoleAPI(data: RoleItemType) {
+  return http<ResponseData<RoleItemType>>({
+    url: `sys/role/${data.id}`,
+    method: 'PUT',
+    data,
+  })
+}
+
+export function deleteCurrentRoleAPI(data: RoleItemType) {
+  return http<ResponseData<RoleItemType>>({
+    url: `sys/role/${data.id}`,
+    method: 'DELETE',
+  })
+}

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ElMessage } from 'element-plus'
-import { addRoleAPI, getCurrentRoleDetailAPI, getRoleListAPI } from '@/api/role'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import { addRoleAPI, deleteCurrentRoleAPI, editCurrentRoleAPI, getCurrentRoleDetailAPI, getRoleListAPI } from '@/api/role'
 import type { RoleItemType, RoleListParamsType } from '@/api/role/types'
 import { State } from '@/enums/TableEnum'
 
@@ -69,12 +69,14 @@ async function openDialog(actionType: string, data: RoleItemType) {
   buttonActionType.value = actionType
 
   if (buttonActionType.value !== 'add') {
+    dialog.visible = true
     const resData = await getCurrentRoleDetail(data)
     if (!resData)
       return
   }
 
   if (data.id) {
+    dialog.visible = true
     dialog.title = '修改角色'
   }
   else {
@@ -83,8 +85,24 @@ async function openDialog(actionType: string, data: RoleItemType) {
   }
 }
 
-function handleDelete() {
-
+async function handleDelete(data: RoleItemType) {
+  try {
+    await ElMessageBox.confirm('您確認要刪除該部門嗎', {
+      confirmButtonText: '確定',
+      cancelButtonText: '取消',
+      type: 'warning',
+    })
+    loading.value = true
+    const resData = await getCurrentRoleDetail(data)
+    if (!resData)
+      return
+    await deleteCurrentRoleAPI(data)
+    ElMessage.success('刪除成功')
+    await getRoleList()
+  }
+  catch (error) {
+    console.error(error)
+  }
 }
 
 function closeDialog() {
@@ -120,12 +138,22 @@ async function handleSubmit() {
     if (isValid) {
       const roleId = formData.id
       if (roleId) {
+        const res = await editCurrentRoleAPI(formData)
+        const resData = res.data
+        if (resData.code === 40001 && !resData.success) {
+          ElMessage({ type: 'error', message: '缺少參數或者此角色不存在' })
+          closeDialog()
+          await getRoleList()
+          return
+        }
         ElMessage.success('修改成功')
       }
       else {
         await addRoleAPI(formData)
         ElMessage.success('新增成功')
       }
+      closeDialog()
+      await getRoleList()
     }
   }
   catch (error) {
@@ -133,19 +161,18 @@ async function handleSubmit() {
   }
   finally {
     dialog.loading = false
-    getRoleList()
-    closeDialog()
   }
 }
 
 async function getCurrentRoleDetail(data: RoleItemType) {
-  dialog.visible = true
-  dialog.loading = true
   try {
+    dialog.loading = true
     const res = await getCurrentRoleDetailAPI(data)
     const resData = res.data
     if (!resData.success && resData.code === 10000) {
-      ElMessage({ type: 'error', message: '查詢角色詳情失敗' })
+      ElMessage({ type: 'error', message: '此角色不存在' })
+      dialog.visible = false
+      await getRoleList()
       return null
     }
     Object.assign(formData, { ...resData.data })
@@ -215,7 +242,7 @@ onMounted(() => {
                 type="primary"
                 size="small"
                 link
-                @click="handleDelete(scope.row.id)"
+                @click="handleDelete(scope.row)"
               >
                 <el-icon><Delete /></el-icon>删除
               </el-button>
