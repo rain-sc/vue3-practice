@@ -87,7 +87,7 @@ async function openDialog(actionType: string, data: RoleItemType) {
 
 async function handleDelete(data: RoleItemType) {
   try {
-    await ElMessageBox.confirm('您確認要刪除該部門嗎', {
+    await ElMessageBox.confirm('您確認要刪除該角色嗎', {
       confirmButtonText: '確定',
       cancelButtonText: '取消',
       type: 'warning',
