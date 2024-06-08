@@ -10,14 +10,13 @@ import {
 } from '@/api/department'
 import type { DepartmentListBaseType, DepartmentListType } from '@/api/department/types'
 import type { ResponseData } from '@/types/global'
+import useDepartmentList from '@/hooks/useDepartmentList'
 
 defineOptions({
   name: 'Department',
   inheritAttrs: false,
 })
 
-const departmentList = ref<DepartmentListType[]>([])
-const loading = ref<boolean>(false)
 const dialog = reactive({
   title: '',
   visible: false,
@@ -90,30 +89,7 @@ const deptFormRef = ref(ElForm)
 const departmentHeadList = ref<DepartmentListBaseType[]>([])
 const buttonActionType = ref<string>('')
 const currentId = ref<string>('')
-
-async function getDepartmentList() {
-  loading.value = true
-  try {
-    const res = await getDepartmentListAPI()
-    const resData = res.data.data!
-    departmentList.value = transListToTreeData(resData, 0)
-  }
-  catch (error) {
-    console.error(error)
-  }
-  finally {
-    loading.value = false
-  }
-}
-
-function transListToTreeData(list: DepartmentListType[], parentId: string | number): DepartmentListType[] {
-  return list
-    .filter(item => item.pid === parentId)
-    .map(item => ({
-      ...item,
-      children: transListToTreeData(list, item.id!),
-    }))
-}
+const { getDepartmentList, departmentList, loading } = useDepartmentList()
 
 async function openDialog(rowData: DepartmentListBaseType, type: string) {
   try {
