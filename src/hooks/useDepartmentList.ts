@@ -4,9 +4,8 @@ import type { DepartmentListType } from '@/api/department/types'
 function useDepartmentList() {
   const departmentList = ref<DepartmentListType[]>([])
   const loading = ref<boolean>(false)
-  const departmentQueryPrams = reactive({
-    departmentId: null,
-  })
+  const departmentId = ref<string | undefined>(undefined)
+
   function transListToTreeData(list: DepartmentListType[], parentId: string | number): DepartmentListType[] {
     return list
       .filter(item => item.pid === parentId)
@@ -23,6 +22,7 @@ function useDepartmentList() {
       const res = await getDepartmentListAPI()
       const resData = res.data.data!
       departmentList.value = transListToTreeData(resData, 0)
+      departmentId.value = departmentList.value[0].id
     }
     catch (error) {
       console.error(error)
@@ -36,7 +36,7 @@ function useDepartmentList() {
     getDepartmentList,
     departmentList,
     loading,
-    departmentQueryPrams,
+    departmentId,
   }
 }
 

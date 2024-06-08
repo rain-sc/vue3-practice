@@ -4,10 +4,13 @@ import type { EmployeeItemType, EmployeeListBaseType, EmployeeParamsType } from 
 import useDepartmentList from '@/hooks/useDepartmentList'
 import { employmentTypes } from '@/enums/TableEnum'
 
-const departmentTreeRef = ref(ElTree)
-const { getDepartmentList, departmentList } = useDepartmentList()
+defineOptions({
+  name: 'Employee',
+  inheritAttrs: false,
+})
+const { getDepartmentList, departmentList, departmentId } = useDepartmentList()
 const employeeList = ref<EmployeeItemType[]>([])
-const employeeParams = reactive<EmployeeParamsType>({
+const employeeQueryParams = reactive<EmployeeParamsType>({
   page: 1,
   size: 10,
   departmentId: null,
@@ -15,10 +18,12 @@ const employeeParams = reactive<EmployeeParamsType>({
 })
 const loading = ref(false)
 const employeeTotal = ref<number>(0)
+const departmentTreeRef = ref(ElTree)
+
 async function getEmployeeList() {
   loading.value = true
   try {
-    const res = await getEmployeeListAPI(employeeParams)
+    const res = await getEmployeeListAPI(employeeQueryParams)
     const resData = res.data.data!
     employeeList.value = resData.rows
     employeeTotal.value = resData.total
@@ -32,13 +37,20 @@ async function getEmployeeList() {
 }
 
 async function currentChange(node: any) {
-  Object.assign(employeeParams, { departmentId: node.id, page: 1 })
+  Object.assign(employeeQueryParams, { departmentId: node.id, page: 1 })
   await getEmployeeList()
 }
-onMounted(() => {
-  getEmployeeList()
-  getDepartmentList()
+
+onMounted(async () => {
+  await getDepartmentList()
+  await departmentTreeRef.value.setCurrentKey(departmentId.value)
+  await getEmployeeList()
 })
+
+async function handleSearchEmployeeList() {
+  Object.assign(employeeQueryParams, { page: 1 })
+  await getEmployeeList()
+}
 </script>
 
 <template>
@@ -47,9 +59,11 @@ onMounted(() => {
       <el-col :lg="4" :xs="24" class="mb-[12px]">
         <el-card shadow="never">
           <el-input
+            v-model="employeeQueryParams.keyword"
             type="text"
             size="small"
             placeholder="輸入員工姓名"
+            @input="handleSearchEmployeeList"
           >
             <template #prefix>
               <el-icon><Search /></el-icon>
@@ -60,10 +74,11 @@ onMounted(() => {
             :props="{ children: 'children', label: 'name', disabled: '' }"
             :expand-on-click-node="false"
             default-expand-all
-            highlight-current
+            :highlight-current="true"
             class="mt-2"
             :data="departmentList"
             node-key="id"
+            :current-node-key="departmentId"
             @current-change="currentChange"
           />
         </el-card>
@@ -87,11 +102,11 @@ onMounted(() => {
           <el-table
             v-loading="loading"
             :data="employeeList"
-            @selection-change="handleSelectionChange"
           >
             <el-table-column prop="staffPhoto" align="center" label="頭像">
               <template #default="{ row }">
-                <el-avatar :src="row.staffPhoto" :size="30" />
+                <el-avatar v-if="row.staffPhoto" :src="row.staffPhoto" :size="30" />
+                <span v-else class="username">{{ row.username?.charAt(0) }}</span>
               </template>
             </el-table-column>
             <el-table-column prop="username" label="姓名" />
@@ -110,8 +125,8 @@ onMounted(() => {
           <pagination
             v-if="employeeTotal > 0"
             v-model:total="employeeTotal"
-            v-model:page="employeeParams.page"
-            v-model:limit="employeeParams.size"
+            v-model:page="employeeQueryParams.page"
+            v-model:limit="employeeQueryParams.size"
             layout="prev, pager, next"
             @pagination="getEmployeeList"
           />
@@ -122,5 +137,15 @@ onMounted(() => {
 </template>
 
 <style scoped lang="scss">
-
+.username{
+  display: inline-block;
+  height: 30px;
+  width: 30px;
+  line-height: 30px;
+  text-align: center;
+  border-radius: 50%;
+  color: #fff;
+  background: #04c9be;
+  font-size: 12px;
+}
 </style>

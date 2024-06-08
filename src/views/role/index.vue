@@ -189,8 +189,8 @@ async function getCurrentRoleDetail(data: RoleItemType) {
   }
 }
 
-onMounted(() => {
-  getRoleList()
+onMounted(async () => {
+  await getRoleList()
 })
 </script>
 

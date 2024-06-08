@@ -274,8 +274,8 @@ async function handleDeleteDepartment(rowData: DepartmentListBaseType) {
   }
 }
 
-onMounted(() => {
-  getDepartmentList()
+onMounted(async () => {
+  await getDepartmentList()
 })
 </script>
 
