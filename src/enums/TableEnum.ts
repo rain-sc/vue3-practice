@@ -3,3 +3,8 @@ export enum State {
   DISABLED = 0,
   UNKNOWN = -1,
 }
+
+export enum employmentTypes {
+  regular = 1,
+  probationary = 2,
+}

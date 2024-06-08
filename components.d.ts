@@ -10,6 +10,7 @@ declare module 'vue' {
     AppLink: typeof import('./src/components/AppLink/index.vue')['default']
     AppMain: typeof import('./src/components/AppMain/index.vue')['default']
     Breadcrumb: typeof import('./src/components/Breadcrumb/index.vue')['default']
+    ElAvatar: typeof import('element-plus/es')['ElAvatar']
     ElBreadcrumb: typeof import('element-plus/es')['ElBreadcrumb']
     ElBreadcrumbItem: typeof import('element-plus/es')['ElBreadcrumbItem']
     ElButton: typeof import('element-plus/es')['ElButton']

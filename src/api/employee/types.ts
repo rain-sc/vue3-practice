@@ -1,6 +1,8 @@
 export interface EmployeeParamsType {
   page: number
   size: number
+  departmentId?: number | null
+  keyword?: string
 }
 
 export interface EmployeeListBaseType {
