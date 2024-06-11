@@ -1,6 +1,6 @@
 {
   "rewrites": [
-    { "source": "/api/:path(.*)", "destination": "https://heimahr.itheima.net/:path" },
+    { "source": "/api/(.*)", "destination": "https://heimahr.itheima.net/" },
     { "source": "/(.*)", "destination": "/" }
   ]
 }
