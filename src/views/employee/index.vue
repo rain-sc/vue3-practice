@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { getEmployeeListAPI } from '@/api/employee'
+import { exportEmployeeListAPI, getEmployeeListAPI } from '@/api/employee'
 import type { EmployeeItemType, EmployeeListBaseType, EmployeeParamsType } from '@/api/employee/types'
 import useDepartmentList from '@/hooks/useDepartmentList'
 import { employmentTypes } from '@/enums/TableEnum'
@@ -41,16 +41,26 @@ async function currentChange(node: any) {
   await getEmployeeList()
 }
 
-onMounted(async () => {
-  await getDepartmentList()
-  await departmentTreeRef.value.setCurrentKey(departmentId.value)
-  await getEmployeeList()
-})
-
 async function handleSearchEmployeeList() {
   Object.assign(employeeQueryParams, { page: 1 })
   await getEmployeeList()
 }
+
+async function handleExportEmployeeList() {
+  try {
+    const res = await exportEmployeeListAPI()
+    console.log('res', res)
+  }
+  catch (error) {
+    console.error(error)
+  }
+}
+
+onMounted(async () => {
+  await getDepartmentList()
+  await departmentTreeRef.value.setCurrentKey(departmentId.value)
+  // await getEmployeeList()
+})
 </script>
 
 <template>
@@ -93,7 +103,7 @@ async function handleSearchEmployeeList() {
             <el-button>
               excel導入
             </el-button>
-            <el-button>
+            <el-button @click="handleExportEmployeeList">
               excel導出
             </el-button>
           </el-row>

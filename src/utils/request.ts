@@ -30,6 +30,12 @@ service.interceptors.request.use(
 
 service.interceptors.response.use(
   (response: AxiosResponse) => {
+    if (
+      response.config.responseType === 'blob'
+      || response.config.responseType === 'arraybuffer'
+    )
+      return response
+
     return response
   },
   (error: any) => {

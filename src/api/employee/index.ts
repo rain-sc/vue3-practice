@@ -8,3 +8,10 @@ export function getEmployeeListAPI(params: EmployeeParamsType) {
     params,
   })
 }
+
+export function exportEmployeeListAPI() {
+  return http({
+    url: 'sys/user/export',
+    responseType: 'blob',
+  })
+}
