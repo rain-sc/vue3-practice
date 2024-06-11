@@ -50,8 +50,7 @@ async function handleSearchEmployeeList() {
 async function handleExportEmployeeList() {
   try {
     const res = await exportEmployeeListAPI()
-    FileSaver.saveAs(res, 'employee.xlsx')
-    console.log('res', res)
+    FileSaver.saveAs(res.data, 'employee.xlsx')
   }
   catch (error) {
     console.error(error)

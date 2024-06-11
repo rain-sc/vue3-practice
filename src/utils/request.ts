@@ -12,7 +12,7 @@ function logout() {
 
 const service = axios.create({
   baseURL: import.meta.env.VITE_APP_BASE_API,
-  timeout: 10000,
+  timeout: 100000,
   headers: { 'Content-Type': 'application/json;charset=utf-8' },
 })
 
@@ -34,7 +34,7 @@ service.interceptors.response.use(
       response.config.responseType === 'blob'
       || response.config.responseType === 'arraybuffer'
     )
-      return response.data
+      return response
 
     return response
   },
