@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import FileSaver from 'file-saver'
 import { exportEmployeeListAPI, getEmployeeListAPI } from '@/api/employee'
 import type { EmployeeItemType, EmployeeListBaseType, EmployeeParamsType } from '@/api/employee/types'
 import useDepartmentList from '@/hooks/useDepartmentList'
@@ -49,6 +50,7 @@ async function handleSearchEmployeeList() {
 async function handleExportEmployeeList() {
   try {
     const res = await exportEmployeeListAPI()
+    FileSaver.saveAs(res, 'employee.xlsx')
     console.log('res', res)
   }
   catch (error) {
@@ -59,7 +61,7 @@ async function handleExportEmployeeList() {
 onMounted(async () => {
   await getDepartmentList()
   await departmentTreeRef.value.setCurrentKey(departmentId.value)
-  // await getEmployeeList()
+  await getEmployeeList()
 })
 </script>
 

@@ -34,7 +34,7 @@ service.interceptors.response.use(
       response.config.responseType === 'blob'
       || response.config.responseType === 'arraybuffer'
     )
-      return response
+      return response.data
 
     return response
   },
