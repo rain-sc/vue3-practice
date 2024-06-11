@@ -11,6 +11,7 @@ const loginForm = ref<LoginDataType>({
 })
 const userStore = useUserStore()
 const router = useRouter()
+const loading = ref<boolean>(false)
 
 const loginRules = computed(() => {
   return {
@@ -50,12 +51,18 @@ const loginRules = computed(() => {
 })
 
 async function handleLogin() {
+  if (loading.value)
+    return
   try {
+    loading.value = true
     await userStore.login(loginForm.value)
     router.push({ path: '/' })
   }
   catch (error) {
     console.error(error)
+  }
+  finally {
+    loading.value = false
   }
 }
 </script>
@@ -79,7 +86,12 @@ async function handleLogin() {
             </el-checkbox>
           </el-form-item>
           <el-form-item>
-            <el-button style="width:350px" type="primary" @click="handleLogin">
+            <el-button
+              style="width:350px"
+              type="primary"
+              :loading="loading"
+              @click="handleLogin"
+            >
               Login
             </el-button>
           </el-form-item>
