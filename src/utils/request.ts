@@ -11,7 +11,8 @@ function logout() {
 }
 
 const service = axios.create({
-  baseURL: import.meta.env.VITE_APP_BASE_API,
+  // baseURL: import.meta.env.VITE_APP_BASE_API,
+  baseURL: 'https://heimahr.itheima.net',
   timeout: 10000,
   headers: { 'Content-Type': 'application/json;charset=utf-8' },
 })
