@@ -1,6 +1,5 @@
 {
   "rewrites": [
-    // { "source": "/(.*)", "destination": "/" },
     {
       "source": "/api/:match*",
       "destination": "https://heimahr.itheima.net/:match*"
