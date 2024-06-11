@@ -6,5 +6,5 @@ export enum State {
 
 export enum employmentTypes {
   regular = 1,
-  probationary = 2,
+  irregular = 2,
 }

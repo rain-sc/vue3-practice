@@ -136,7 +136,7 @@ onMounted(async () => {
             <el-table-column prop="formOfEmployment" label="聘用形式">
               <template #default="{ row }">
                 <span v-if="row.formOfEmployment === employmentTypes.regular">正式</span>
-                <span v-else-if="row.formOfEmployment === employmentTypes.probationary">非正式</span>
+                <span v-else-if="row.formOfEmployment === employmentTypes.irregular">非正式</span>
                 <span v-else>無</span>
               </template>
             </el-table-column>
