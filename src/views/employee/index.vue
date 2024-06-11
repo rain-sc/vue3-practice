@@ -20,6 +20,7 @@ const employeeQueryParams = reactive<EmployeeParamsType>({
 const loading = ref(false)
 const employeeTotal = ref<number>(0)
 const departmentTreeRef = ref(ElTree)
+const exportButtonLoading = ref<boolean>(false)
 
 async function getEmployeeList() {
   loading.value = true
@@ -48,12 +49,18 @@ async function handleSearchEmployeeList() {
 }
 
 async function handleExportEmployeeList() {
+  if (exportButtonLoading.value)
+    return
   try {
+    exportButtonLoading.value = true
     const res = await exportEmployeeListAPI()
     FileSaver.saveAs(res.data, 'employee.xlsx')
   }
   catch (error) {
     console.error(error)
+  }
+  finally {
+    exportButtonLoading.value = false
   }
 }
 
@@ -104,7 +111,10 @@ onMounted(async () => {
             <el-button>
               excel導入
             </el-button>
-            <el-button @click="handleExportEmployeeList">
+            <el-button
+              :loading="exportButtonLoading"
+              @click="handleExportEmployeeList"
+            >
               excel導出
             </el-button>
           </el-row>
