@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import FileSaver from 'file-saver'
-import { exportEmployeeListAPI, getEmployeeListAPI, importEmployeeTemplateAPI } from '@/api/employee'
+import { ElMessage, ElUpload } from 'element-plus'
+import { exportEmployeeListAPI, getEmployeeListAPI, importEmployeeListAPI, importEmployeeTemplateAPI } from '@/api/employee'
 import type { EmployeeItemType, EmployeeListBaseType, EmployeeParamsType } from '@/api/employee/types'
 import useDepartmentList from '@/hooks/useDepartmentList'
 import { employmentTypes } from '@/enums/TableEnum'
@@ -21,6 +22,16 @@ const loading = ref(false)
 const employeeTotal = ref<number>(0)
 const departmentTreeRef = ref(ElTree)
 const exportButtonLoading = ref<boolean>(false)
+const dialog = reactive({
+  visible: false,
+  title: '',
+  loading: false,
+})
+const importData = reactive({
+  fileList: [],
+  file: undefined,
+})
+const uploadRef = ref(ElUpload)
 
 async function getEmployeeList() {
   loading.value = true
@@ -74,6 +85,56 @@ async function handleDownloadEmployeeTemplate() {
   }
 }
 
+function openDialog() {
+  try {
+    dialog.visible = true
+    dialog.title = '員工列表導入'
+  }
+  catch (error) {
+    console.error(error)
+  }
+}
+
+function closeDialog() {
+  dialog.visible = false
+  importData.file = undefined
+  importData.fileList = []
+  dialog.loading = false
+}
+
+function handleFileChange(file: any) {
+  importData.file = file.raw
+}
+
+function handleFileExceed(files: any) {
+  uploadRef.value.clearFiles()
+  const file = files[0]
+  uploadRef.value!.handleStart(file)
+  importData.file = file
+}
+
+const handleSubmitImportEmployeeList = useThrottleFn(async () => {
+  if (!importData.file) {
+    ElMessage.warning('上傳Excel文件不能為空')
+    return false
+  }
+  if (dialog.loading)
+    return
+  dialog.loading = true
+  try {
+    await importEmployeeListAPI(importData.file)
+    ElMessage.success('導入成功')
+  }
+  catch (error) {
+    console.error(error)
+  }
+  finally {
+    closeDialog()
+    await getDepartmentList()
+    await getEmployeeList()
+  }
+}, 3000)
+
 onMounted(async () => {
   await getDepartmentList()
   await departmentTreeRef.value.setCurrentKey(departmentId.value)
@@ -125,6 +186,9 @@ onMounted(async () => {
                   <el-dropdown-item @click="handleDownloadEmployeeTemplate">
                     <el-icon><Download /></el-icon>下載模板
                   </el-dropdown-item>
+                  <el-dropdown-item @click="openDialog">
+                    <el-icon><Top /></el-icon>excel導入
+                  </el-dropdown-item>
                 </el-dropdown-menu>
               </template>
             </el-dropdown>
@@ -171,6 +235,55 @@ onMounted(async () => {
         </el-card>
       </el-col>
     </el-row>
+    <el-dialog
+      v-model="dialog.visible"
+      :title="dialog.title"
+      width="500px"
+      append-to-body
+      @close="closeDialog"
+    >
+      <el-form
+        :model="importData"
+        label-width="100px"
+      >
+        <el-form-item label="Excel文件">
+          <ElUpload
+            ref="uploadRef"
+            action=""
+            drag
+            accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+            :limit="1"
+            :auto-upload="false"
+            :file-list="importData.fileList"
+            :on-change="handleFileChange"
+            :on-exceed="handleFileExceed"
+          >
+            <el-icon size="50">
+              <UploadFilled />
+            </el-icon>
+            <div class="el-upload__text">
+              將文件拖到此處,或
+              <em>點擊上傳</em>
+            </div>
+            <template #tip>
+              <div>xls/xlsx files</div>
+            </template>
+          </ElUpload>
+        </el-form-item>
+      </el-form>
+      <div class="dialog-footer">
+        <el-button
+          :loading="dialog.loading"
+          type="primary"
+          @click="handleSubmitImportEmployeeList"
+        >
+          確定
+        </el-button>
+        <el-button @click="closeDialog">
+          取消
+        </el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
