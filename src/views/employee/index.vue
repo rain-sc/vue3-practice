@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import FileSaver from 'file-saver'
-import { exportEmployeeListAPI, getEmployeeListAPI } from '@/api/employee'
+import { exportEmployeeListAPI, getEmployeeListAPI, importEmployeeTemplateAPI } from '@/api/employee'
 import type { EmployeeItemType, EmployeeListBaseType, EmployeeParamsType } from '@/api/employee/types'
 import useDepartmentList from '@/hooks/useDepartmentList'
 import { employmentTypes } from '@/enums/TableEnum'
@@ -54,13 +54,23 @@ async function handleExportEmployeeList() {
   try {
     exportButtonLoading.value = true
     const res = await exportEmployeeListAPI()
-    FileSaver.saveAs(res.data, 'employee.xlsx')
+    FileSaver.saveAs(res.data, '員工列表.xlsx')
   }
   catch (error) {
     console.error(error)
   }
   finally {
     exportButtonLoading.value = false
+  }
+}
+
+async function handleDownloadEmployeeTemplate() {
+  try {
+    const res = await importEmployeeTemplateAPI()
+    FileSaver.saveAs(res.data, '員工導入模板.xlsx')
+  }
+  catch (error) {
+    console.error(error)
   }
 }
 
@@ -104,13 +114,20 @@ onMounted(async () => {
 
       <el-col :lg="20" :xs="24">
         <div class="search-container">
-          <el-row class="opeate-tools" type="flex" justify="end">
+          <el-row class="opeate-tools gap-x-2" type="flex" justify="end">
             <el-button type="primary">
               新增員工
             </el-button>
-            <el-button>
-              excel導入
-            </el-button>
+            <el-dropdown split-button>
+              導入
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <el-dropdown-item @click="handleDownloadEmployeeTemplate">
+                    <el-icon><Download /></el-icon>下載模板
+                  </el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
             <el-button
               :loading="exportButtonLoading"
               @click="handleExportEmployeeList"
@@ -168,5 +185,11 @@ onMounted(async () => {
   color: #fff;
   background: #04c9be;
   font-size: 12px;
+}
+
+:deep(.el-dropdown__caret-button){
+  &:focus-within{
+    outline: none;
+  }
 }
 </style>

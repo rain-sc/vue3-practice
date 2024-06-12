@@ -15,3 +15,10 @@ export function exportEmployeeListAPI() {
     responseType: 'blob',
   })
 }
+
+export function importEmployeeTemplateAPI() {
+  return http({
+    url: 'sys/user/import/template',
+    responseType: 'blob',
+  })
+}
