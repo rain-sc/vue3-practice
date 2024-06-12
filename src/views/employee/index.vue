@@ -287,7 +287,7 @@ async function handleDeleteCurrentEmployee(id: number) {
     await getDepartmentList()
   }
 }
-function changeDepartmentId(list: any[]) {
+function changeDepartmentId(list: any) {
   if (list.length === 0)
     return
   formData.value.departmentId = list[list.length - 1]
