@@ -13,7 +13,7 @@ export interface EmployeeListBaseType {
 export interface EmployeeItemType {
   correctionTime?: string
   departmentName?: string
-  formOfEmployment?: number
+  formOfEmployment?: number | string
   id?: string
   mobile?: string
   password?: string

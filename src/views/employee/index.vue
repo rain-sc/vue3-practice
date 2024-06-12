@@ -2,6 +2,7 @@
 import FileSaver from 'file-saver'
 import { ElDialog, ElMessage, ElUpload } from 'element-plus'
 import {
+  addEmployeeAPI,
   deleteCurrentEmployeeAPI,
   editCurrentEmployeeAPI,
   exportEmployeeListAPI,
@@ -44,16 +45,7 @@ const importData = reactive({
 })
 const uploadRef = ref(ElUpload)
 const employeeFormRef = ref(ElForm)
-const formData = reactive<EmployeeItemType>({
-  username: '',
-  id: '',
-  workNumber: '',
-  mobile: '',
-  departmentId: 0,
-  formOfEmployment: 0,
-  timeOfEntry: '',
-  correctionTime: '',
-})
+const formData = ref<EmployeeItemType>({})
 const rules = reactive({
   username: [
     {
@@ -102,8 +94,8 @@ const rules = reactive({
   ],
   correctionTime: [{ required: true, message: '請選擇轉正時間', trigger: 'blur' }, {
     validator: (rule: any, value: any, callback: any) => {
-      if (formData.timeOfEntry) {
-        if (new Date(formData.timeOfEntry) > new Date(value)) {
+      if (formData.value.timeOfEntry) {
+        if (new Date(formData.value.timeOfEntry) > new Date(value)) {
           callback(new Error('轉正時間不能小於入職時間'))
           return
         }
@@ -175,10 +167,14 @@ async function openDialog(type: string, data?: EmployeeItemType) {
   dialog.visible = true
   dialog.type = type
   if (dialog.type === 'employeeForm') {
-    dialog.title = '員工詳情'
-    await getCurrentEmployeeDetail(data!)
+    if (data?.id) {
+      dialog.title = '員工詳情'
+      await getCurrentEmployeeDetail(data!)
+    }
+    else {
+      dialog.title = '新增員工'
+    }
   }
-
   else if (dialog.type === 'importEmployeeList') {
     dialog.title = '員工列表導入'
   }
@@ -186,19 +182,11 @@ async function openDialog(type: string, data?: EmployeeItemType) {
 
 function closeDialog() {
   dialog.visible = false
+
   if (dialog.type === 'employeeForm') {
     employeeFormRef.value.resetFields()
     employeeFormRef.value.clearValidate()
-    Object.assign(formData, {
-      username: '',
-      id: '',
-      workNumber: '',
-      mobile: '',
-      departmentId: 0,
-      formOfEmployment: 0,
-      timeOfEntry: '',
-      correctionTime: '',
-    })
+    formData.value = {}
   }
   else if (dialog.type === 'importEmployeeList') {
     importData.file = undefined
@@ -251,12 +239,24 @@ const handleSubmit = useThrottleFn(async () => {
     const isValid = await validateForm()
     try {
       if (isValid) {
-        const res = await editCurrentEmployeeAPI(formData)
-        if (res.data.code === 10000 && res.data.success) {
-          ElMessage.success('修改成功')
-          closeDialog()
-          getEmployeeList()
-          getDepartmentList()
+        const id = formData.value.id
+        if (id) {
+          const res = await editCurrentEmployeeAPI(formData.value)
+          if (res.data.code === 10000 && res.data.success) {
+            ElMessage.success('修改成功')
+            closeDialog()
+            getEmployeeList()
+            getDepartmentList()
+          }
+        }
+        else {
+          const res = await addEmployeeAPI(formData.value)
+          if (res.data.code === 10000 && res.data.success) {
+            ElMessage.success('新增成功')
+            closeDialog()
+            getEmployeeList()
+            getDepartmentList()
+          }
         }
       }
     }
@@ -290,9 +290,7 @@ async function handleDeleteCurrentEmployee(id: number) {
 function changeDepartmentId(list: []) {
   if (list.length === 0)
     return
-  Object.assign(formData, {
-    departmentId: list[list.length - 1],
-  })
+  formData.value.departmentId = list[list.length - 1]
 }
 
 async function getCurrentEmployeeDetail(data: EmployeeItemType) {
@@ -300,7 +298,7 @@ async function getCurrentEmployeeDetail(data: EmployeeItemType) {
   try {
     const res = await getCurrentEmployeeDetailAPI(data)
     const resData = res.data.data
-    Object.assign(formData, resData)
+    formData.value = resData!
   }
   catch (error) {
     console.error(error)
@@ -352,7 +350,7 @@ onMounted(async () => {
       <el-col :lg="20" :xs="24">
         <div class="search-container">
           <el-row class="opeate-tools gap-x-2" type="flex" justify="end">
-            <el-button type="primary">
+            <el-button type="primary" @click="openDialog('employeeForm')">
               新增員工
             </el-button>
             <el-dropdown split-button>
@@ -497,8 +495,9 @@ onMounted(async () => {
           <el-form-item label="手機號碼" prop="mobile">
             <el-input
               v-model="formData.mobile"
-              readonly
-              :disabled="true"
+              placeholder="請輸入手機號碼"
+              :readonly="formData.id ? true : false"
+              :disabled="formData.id ? true : false"
             />
           </el-form-item>
           <el-form-item label="部門" prop="departmentId">
@@ -508,11 +507,15 @@ onMounted(async () => {
               :props="treeDataProps"
               separator="-"
               :value="formData.departmentId"
+              placeholder="請選擇部門"
               @change="changeDepartmentId"
             />
           </el-form-item>
           <el-form-item label="聘用形式" prop="formOfEmployment">
-            <el-select v-model="formData.formOfEmployment">
+            <el-select
+              v-model="formData.formOfEmployment"
+              placeholder="請輸入聘用形式"
+            >
               <el-option label="正式" :value="employmentTypes.regular" />
               <el-option label="非正式" :value="employmentTypes.irregular" />
             </el-select>
@@ -522,6 +525,7 @@ onMounted(async () => {
               v-model="formData.timeOfEntry "
               type="date"
               value-format="YYYY-MM-DD"
+              placeholder="請輸入入職時間"
             />
           </el-form-item>
 
@@ -530,6 +534,7 @@ onMounted(async () => {
               v-model="formData.correctionTime"
               type="date"
               value-format="YYYY-MM-DD"
+              placeholder="請輸入轉正時間"
             />
           </el-form-item>
         </el-form>

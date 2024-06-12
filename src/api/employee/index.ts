@@ -44,15 +44,23 @@ export function deleteCurrentEmployeeAPI(id: number) {
 }
 
 export function getCurrentEmployeeDetailAPI(data: EmployeeItemType) {
-  return http<ResponseData<EmployeeListBaseType>>({
+  return http<ResponseData<EmployeeItemType>>({
     url: `sys/user/${data.id}`,
   })
 }
 
 export function editCurrentEmployeeAPI(data: EmployeeItemType) {
   return http({
-    url: `/sys/user/${data.id}`,
+    url: `sys/user/${data.id}`,
     method: 'PUT',
+    data,
+  })
+}
+
+export function addEmployeeAPI(data: EmployeeItemType) {
+  return http({
+    url: 'sys/user',
+    method: 'POST',
     data,
   })
 }
