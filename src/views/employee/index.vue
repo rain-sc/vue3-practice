@@ -3,6 +3,7 @@ import FileSaver from 'file-saver'
 import { ElDialog, ElMessage, ElUpload } from 'element-plus'
 import {
   deleteCurrentEmployeeAPI,
+  editCurrentEmployeeAPI,
   exportEmployeeListAPI,
   getCurrentEmployeeDetailAPI,
   getEmployeeListAPI,
@@ -61,9 +62,9 @@ const rules = reactive({
       trigger: 'blur',
     },
     {
-      min: 1,
-      max: 10,
-      message: '姓名為1-10位',
+      min: 2,
+      max: 4,
+      message: '姓名為2-4位',
     },
   ],
   mobile: [
@@ -114,9 +115,9 @@ const rules = reactive({
 const treeDataProps = ref({
   value: 'id',
   label: 'name',
+  children: 'children',
 })
 const treeData = ref<DepartmentListBaseType[]>([])
-const selectDepartmentId = ref()
 
 async function getEmployeeList() {
   loading.value = true
@@ -220,14 +221,14 @@ function handleFileExceed(files: any) {
 }
 
 const handleSubmit = useThrottleFn(async () => {
+  if (dialog.submitLoading)
+    return
+  dialog.submitLoading = true
   if (dialog.type === 'importEmployeeList') {
     if (!importData.file) {
       ElMessage.warning('上傳Excel文件不能為空')
       return false
     }
-    if (dialog.submitLoading)
-      return
-    dialog.submitLoading = true
     try {
       await importEmployeeListAPI(importData.file)
       ElMessage.success('導入成功')
@@ -239,6 +240,31 @@ const handleSubmit = useThrottleFn(async () => {
       closeDialog()
       getEmployeeList()
       getDepartmentList()
+    }
+  }
+  else if (dialog.type === 'employeeForm') {
+    const validateForm = () => new Promise((resolve) => {
+      employeeFormRef.value.validate((valid: any) => {
+        resolve(valid)
+      })
+    })
+    const isValid = await validateForm()
+    try {
+      if (isValid) {
+        const res = await editCurrentEmployeeAPI(formData)
+        if (res.data.code === 10000 && res.data.success) {
+          ElMessage.success('修改成功')
+          closeDialog()
+          getEmployeeList()
+          getDepartmentList()
+        }
+      }
+    }
+    catch (error) {
+      console.error(error)
+    }
+    finally {
+      dialog.submitLoading = false
     }
   }
 }, 3000)
@@ -264,7 +290,9 @@ async function handleDeleteCurrentEmployee(id: number) {
 function changeDepartmentId(list: []) {
   if (list.length === 0)
     return
-  selectDepartmentId.value = list[list.length - 1]
+  Object.assign(formData, {
+    departmentId: list[list.length - 1],
+  })
 }
 
 async function getCurrentEmployeeDetail(data: EmployeeItemType) {
@@ -479,12 +507,15 @@ onMounted(async () => {
               :options="treeData"
               :props="treeDataProps"
               separator="-"
-              :value="selectDepartmentId"
+              :value="formData.departmentId"
               @change="changeDepartmentId"
             />
           </el-form-item>
           <el-form-item label="聘用形式" prop="formOfEmployment">
-            <el-select />
+            <el-select v-model="formData.formOfEmployment">
+              <el-option label="正式" :value="employmentTypes.regular" />
+              <el-option label="非正式" :value="employmentTypes.irregular" />
+            </el-select>
           </el-form-item>
           <el-form-item label="入職時間" prop="timeOfEntry">
             <el-date-picker

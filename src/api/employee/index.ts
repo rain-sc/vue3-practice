@@ -48,3 +48,11 @@ export function getCurrentEmployeeDetailAPI(data: EmployeeItemType) {
     url: `sys/user/${data.id}`,
   })
 }
+
+export function editCurrentEmployeeAPI(data: EmployeeItemType) {
+  return http({
+    url: `/sys/user/${data.id}`,
+    method: 'PUT',
+    data,
+  })
+}
