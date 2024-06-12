@@ -307,9 +307,9 @@ async function getCurrentEmployeeDetail(data: EmployeeItemType) {
     dialog.loading = false
   }
 }
-onMounted(async () => {
-  await getDepartmentList()
-  departmentTreeRef.value.setCurrentKey(departmentId.value)
+onMounted(() => {
+  getDepartmentList()
+  // departmentTreeRef.value.setCurrentKey(departmentId.value)
   getEmployeeList()
   treeData.value = departmentList.value
 })
