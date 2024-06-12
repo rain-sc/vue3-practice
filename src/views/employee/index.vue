@@ -32,12 +32,24 @@ const dialog = reactive({
   visible: false,
   title: '',
   loading: false,
+  type: '',
 })
 const importData = reactive({
   fileList: [],
   file: undefined,
 })
 const uploadRef = ref(ElUpload)
+const employeeFormRef = ref(ElForm)
+const formData = reactive({
+  username: '',
+  id: '',
+  workNumber: '',
+  mobile: '',
+  departmentId: '',
+  formOfEmployment: '',
+  timeOfEntry: '',
+  correctionTime: '',
+})
 
 async function getEmployeeList() {
   loading.value = true
@@ -91,14 +103,14 @@ async function handleDownloadEmployeeTemplate() {
   }
 }
 
-function openDialog() {
-  try {
-    dialog.visible = true
+function openDialog(type: string, id?: number) {
+  dialog.visible = true
+  dialog.type = type
+  if (dialog.type === 'employeeForm')
+    dialog.title = '員工詳情'
+
+  else if (dialog.type === 'importEmployeeList')
     dialog.title = '員工列表導入'
-  }
-  catch (error) {
-    console.error(error)
-  }
 }
 
 function closeDialog() {
@@ -106,6 +118,7 @@ function closeDialog() {
   importData.file = undefined
   importData.fileList = []
   dialog.loading = false
+  dialog.type = ''
 }
 
 function handleFileChange(file: any) {
@@ -119,25 +132,27 @@ function handleFileExceed(files: any) {
   importData.file = file
 }
 
-const handleSubmitImportEmployeeList = useThrottleFn(async () => {
-  if (!importData.file) {
-    ElMessage.warning('上傳Excel文件不能為空')
-    return false
-  }
-  if (dialog.loading)
-    return
-  dialog.loading = true
-  try {
-    await importEmployeeListAPI(importData.file)
-    ElMessage.success('導入成功')
-  }
-  catch (error) {
-    console.error(error)
-  }
-  finally {
-    closeDialog()
-    await getDepartmentList()
-    await getEmployeeList()
+const handleSubmit = useThrottleFn(async () => {
+  if (dialog.type === 'importEmployeeList') {
+    if (!importData.file) {
+      ElMessage.warning('上傳Excel文件不能為空')
+      return false
+    }
+    if (dialog.loading)
+      return
+    dialog.loading = true
+    try {
+      await importEmployeeListAPI(importData.file)
+      ElMessage.success('導入成功')
+    }
+    catch (error) {
+      console.error(error)
+    }
+    finally {
+      closeDialog()
+      await getEmployeeList()
+      await getDepartmentList()
+    }
   }
 }, 3000)
 
@@ -155,9 +170,13 @@ async function handleDeleteCurrentEmployee(id: number) {
     console.error(error)
   }
   finally {
-    await getDepartmentList()
     await getEmployeeList()
+    await getDepartmentList()
   }
+}
+
+function rules() {
+
 }
 
 onMounted(async () => {
@@ -212,7 +231,7 @@ onMounted(async () => {
                   <el-dropdown-item @click="handleDownloadEmployeeTemplate">
                     <el-icon><Download /></el-icon>下載模板
                   </el-dropdown-item>
-                  <el-dropdown-item @click="openDialog">
+                  <el-dropdown-item @click="openDialog('importEmployeeList')">
                     <el-icon><Top /></el-icon>excel導入
                   </el-dropdown-item>
                 </el-dropdown-menu>
@@ -252,6 +271,14 @@ onMounted(async () => {
             <el-table-column label="操作" fixed="right" width="220">
               <template #default="scope">
                 <el-button
+                  type="primary"
+                  link
+                  size="small"
+                  @click="openDialog('employeeForm', scope.row.id)"
+                >
+                  <el-icon><Edit /></el-icon>編輯
+                </el-button>
+                <el-button
                   size="small"
                   link
                   type="primary"
@@ -281,6 +308,7 @@ onMounted(async () => {
       @close="closeDialog"
     >
       <el-form
+        v-if="dialog.type === 'importEmployeeList'"
         :model="importData"
         label-width="100px"
       >
@@ -309,11 +337,57 @@ onMounted(async () => {
           </ElUpload>
         </el-form-item>
       </el-form>
+
+      <el-form
+        v-if="dialog.type === 'employeeForm'"
+        ref="employeeFormRef"
+        :model="formData"
+        :rules="rules"
+        label-width="80px"
+      >
+        <el-form-item label="姓名" prop="username">
+          <el-input
+            v-model="formData.username"
+            placeholder="請輸入姓名"
+          />
+        </el-form-item>
+        <el-form-item label="員工編號" prop="workNumber">
+          <el-input
+            class="inputW"
+            readonly
+          />
+        </el-form-item>
+        <el-form-item label="手機號碼" prop="mobile">
+          <el-input
+            class="inputW"
+            readonly
+          />
+        </el-form-item>
+        <el-form-item label="部門" prop="departmentId">
+          todo
+        </el-form-item>
+        <el-form-item label="聘用形式" prop="formOfEmployment">
+          <el-select class="inputW" />
+        </el-form-item>
+        <el-form-item label="入職時間" prop="timeOfEntry">
+          <el-date-picker
+            type="date"
+            value-format="yyyy-MM-dd"
+            class="inputW"
+          />
+        </el-form-item>
+        <el-form-item label="轉正時間" prop="correctionTime">
+          <el-date-picker
+            type="date"
+            class="inputW"
+          />
+        </el-form-item>
+      </el-form>
       <div class="dialog-footer">
         <el-button
           :loading="dialog.loading"
           type="primary"
-          @click="handleSubmitImportEmployeeList"
+          @click="handleSubmit"
         >
           確定
         </el-button>
