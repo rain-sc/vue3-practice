@@ -11,6 +11,7 @@ import {
 import type { EmployeeItemType, EmployeeParamsType } from '@/api/employee/types'
 import useDepartmentList from '@/hooks/useDepartmentList'
 import { employmentTypes } from '@/enums/TableEnum'
+import type { DepartmentListBaseType } from '@/api/department/types'
 
 defineOptions({
   name: 'Employee',
@@ -50,6 +51,70 @@ const formData = reactive({
   timeOfEntry: '',
   correctionTime: '',
 })
+const rules = reactive({
+  username: [
+    {
+      required: true,
+      message: '請輸入姓名',
+      trigger: 'blur',
+    },
+    {
+      min: 1,
+      max: 4,
+      message: '姓名為1-4位',
+    },
+  ],
+  mobile: [
+    {
+      required: true,
+      message: '請輸入手機號',
+      trigger: 'blur',
+    },
+    {
+      pattern: /^1[3-9]\d{9}$/,
+      message: '手機號格式不正確',
+      trigger: 'blur',
+    },
+  ],
+  formOfEmployment: [
+    {
+      required: true,
+      message: '請選擇聘用形式',
+      trigger: 'blur',
+    },
+  ],
+  departmentId: [
+    {
+      required: true,
+      message: '請選擇部門',
+      trigger: 'blur',
+    },
+  ],
+  timeOfEntry: [
+    {
+      required: true,
+      message: '請選擇入職時間',
+      trigger: 'blur',
+    },
+  ],
+  correctionTime: [{ required: true, message: '請選擇轉正時間', trigger: 'blur' }, {
+    validator: (rule: any, value: any, callback: any) => {
+      if (formData.timeOfEntry) {
+        if (new Date(formData.timeOfEntry) > new Date(value)) {
+          callback(new Error('轉正時間不能小於入職時間'))
+          return
+        }
+      }
+      callback()
+    },
+  }],
+})
+const treeDataProps = ref({
+  value: 'id',
+  label: 'name',
+})
+const treeData = ref<DepartmentListBaseType[]>([])
+const selectDepartmentId = ref()
 
 async function getEmployeeList() {
   loading.value = true
@@ -174,15 +239,17 @@ async function handleDeleteCurrentEmployee(id: number) {
     await getDepartmentList()
   }
 }
-
-function rules() {
-
+function changeDepartmentId(list: []) {
+  if (list.length === 0)
+    return
+  selectDepartmentId.value = list[list.length - 1]
 }
 
 onMounted(async () => {
   await getDepartmentList()
   await departmentTreeRef.value.setCurrentKey(departmentId.value)
   await getEmployeeList()
+  treeData.value = departmentList.value
 })
 </script>
 
@@ -353,33 +420,36 @@ onMounted(async () => {
         </el-form-item>
         <el-form-item label="員工編號" prop="workNumber">
           <el-input
-            class="inputW"
             readonly
           />
         </el-form-item>
         <el-form-item label="手機號碼" prop="mobile">
           <el-input
-            class="inputW"
             readonly
           />
         </el-form-item>
         <el-form-item label="部門" prop="departmentId">
-          todo
+          <el-cascader
+            v-model="formData.departmentId"
+            :options="treeData"
+            :props="treeDataProps"
+            separator="-"
+            :value="selectDepartmentId"
+            @change="changeDepartmentId"
+          />
         </el-form-item>
         <el-form-item label="聘用形式" prop="formOfEmployment">
-          <el-select class="inputW" />
+          <el-select />
         </el-form-item>
         <el-form-item label="入職時間" prop="timeOfEntry">
           <el-date-picker
             type="date"
             value-format="yyyy-MM-dd"
-            class="inputW"
           />
         </el-form-item>
         <el-form-item label="轉正時間" prop="correctionTime">
           <el-date-picker
             type="date"
-            class="inputW"
           />
         </el-form-item>
       </el-form>
