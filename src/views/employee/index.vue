@@ -1,8 +1,14 @@
 <script setup lang="ts">
 import FileSaver from 'file-saver'
 import { ElMessage, ElUpload } from 'element-plus'
-import { exportEmployeeListAPI, getEmployeeListAPI, importEmployeeListAPI, importEmployeeTemplateAPI } from '@/api/employee'
-import type { EmployeeItemType, EmployeeListBaseType, EmployeeParamsType } from '@/api/employee/types'
+import {
+  deleteCurrentEmployeeAPI,
+  exportEmployeeListAPI,
+  getEmployeeListAPI,
+  importEmployeeListAPI,
+  importEmployeeTemplateAPI,
+} from '@/api/employee'
+import type { EmployeeItemType, EmployeeParamsType } from '@/api/employee/types'
 import useDepartmentList from '@/hooks/useDepartmentList'
 import { employmentTypes } from '@/enums/TableEnum'
 
@@ -135,6 +141,25 @@ const handleSubmitImportEmployeeList = useThrottleFn(async () => {
   }
 }, 3000)
 
+async function handleDeleteCurrentEmployee(id: number) {
+  try {
+    await ElMessageBox.confirm('確認刪除用戶?', '警告', {
+      confirmButtonText: '確定',
+      cancelButtonText: '取消',
+      type: 'warning',
+    })
+    await deleteCurrentEmployeeAPI(id)
+    ElMessage.success('删除成功')
+  }
+  catch (error) {
+    console.error(error)
+  }
+  finally {
+    await getDepartmentList()
+    await getEmployeeList()
+  }
+}
+
 onMounted(async () => {
   await getDepartmentList()
   await departmentTreeRef.value.setCurrentKey(departmentId.value)
@@ -223,6 +248,18 @@ onMounted(async () => {
             </el-table-column>
             <el-table-column prop="departmentName" label="部門" />
             <el-table-column prop="timeOfEntry" label="入職時間" sortable />
+            <el-table-column label="操作" fixed="right" width="220">
+              <template #default="scope">
+                <el-button
+                  size="small"
+                  link
+                  type="primary"
+                  @click="handleDeleteCurrentEmployee(scope.row.id)"
+                >
+                  <el-icon><Delete /></el-icon>刪除
+                </el-button>
+              </template>
+            </el-table-column>
           </el-table>
           <pagination
             v-if="employeeTotal > 0"

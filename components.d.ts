@@ -39,6 +39,7 @@ declare module 'vue' {
     ElTree: typeof import('element-plus/es')['ElTree']
     ElUpload: typeof import('element-plus/es')['ElUpload']
     Hamburger: typeof import('./src/components/Hamburger/index.vue')['default']
+    IEpDelete: typeof import('~icons/ep/delete')['default']
     IEpDownload: typeof import('~icons/ep/download')['default']
     IEpUploadFilled: typeof import('~icons/ep/upload-filled')['default']
     NavBar: typeof import('./src/components/NavBar/index.vue')['default']

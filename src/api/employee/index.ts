@@ -35,3 +35,10 @@ export function importEmployeeListAPI(file: File) {
     },
   })
 }
+
+export function deleteCurrentEmployeeAPI(id: number) {
+  return http({
+    url: `sys/user/${id}`,
+    method: 'DELETE',
+  })
+}
