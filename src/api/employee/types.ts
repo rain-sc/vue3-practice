@@ -11,14 +11,18 @@ export interface EmployeeListBaseType {
 }
 
 export interface EmployeeItemType {
-  correctionTime: string
-  departmentName: string
-  formOfEmployment: number
-  id: string
-  mobile: string
-  password: string
-  staffPhoto: string
-  timeOfEntry: string
-  username: string
-  workNumber: string
+  correctionTime?: string
+  departmentName?: string
+  formOfEmployment?: number
+  id?: string
+  mobile?: string
+  password?: string
+  staffPhoto?: string
+  timeOfEntry?: string
+  username?: string
+  workNumber?: string
+  companyId?: string
+  companyName?: string
+  roleIds?: string[]
+  departmentId?: number
 }

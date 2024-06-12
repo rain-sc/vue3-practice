@@ -1,4 +1,4 @@
-import type { EmployeeListBaseType, EmployeeParamsType } from './types'
+import type { EmployeeItemType, EmployeeListBaseType, EmployeeParamsType } from './types'
 import type { ResponseData } from '@/types/global'
 import { http } from '@/utils/request'
 
@@ -40,5 +40,11 @@ export function deleteCurrentEmployeeAPI(id: number) {
   return http({
     url: `sys/user/${id}`,
     method: 'DELETE',
+  })
+}
+
+export function getCurrentEmployeeDetailAPI(data: EmployeeItemType) {
+  return http<ResponseData<EmployeeListBaseType>>({
+    url: `sys/user/${data.id}`,
   })
 }
