@@ -3,7 +3,7 @@ import type { DepartmentListType } from '@/api/department/types'
 
 function useDepartmentList() {
   const departmentList = ref<DepartmentListType[]>([])
-  const loading = ref<boolean>(false)
+  const departmentListLoading = ref<boolean>(false)
   const departmentId = ref<string | undefined>(undefined)
 
   function transListToTreeData(list: DepartmentListType[], parentId: string | number): DepartmentListType[] {
@@ -16,7 +16,7 @@ function useDepartmentList() {
   }
 
   async function getDepartmentList() {
-    loading.value = true
+    departmentListLoading.value = true
 
     try {
       const res = await getDepartmentListAPI()
@@ -28,14 +28,14 @@ function useDepartmentList() {
       console.error(error)
     }
     finally {
-      loading.value = false
+      departmentListLoading.value = false
     }
   }
 
   return {
     getDepartmentList,
     departmentList,
-    loading,
+    departmentListLoading,
     departmentId,
   }
 }

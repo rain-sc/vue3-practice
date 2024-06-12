@@ -16,7 +16,7 @@ defineOptions({
   name: 'Employee',
   inheritAttrs: false,
 })
-const { getDepartmentList, departmentList, departmentId } = useDepartmentList()
+const { getDepartmentList, departmentList, departmentId, departmentListLoading } = useDepartmentList()
 const employeeList = ref<EmployeeItemType[]>([])
 const employeeQueryParams = reactive<EmployeeParamsType>({
   page: 1,
@@ -185,6 +185,7 @@ onMounted(async () => {
           </el-input>
           <el-tree
             ref="departmentTreeRef"
+            v-loading="departmentListLoading"
             :props="{ children: 'children', label: 'name', disabled: '' }"
             :expand-on-click-node="false"
             default-expand-all

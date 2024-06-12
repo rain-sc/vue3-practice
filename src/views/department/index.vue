@@ -89,7 +89,7 @@ const deptFormRef = ref(ElForm)
 const departmentHeadList = ref<DepartmentListBaseType[]>([])
 const buttonActionType = ref<string>('')
 const currentId = ref<string>('')
-const { getDepartmentList, departmentList, loading } = useDepartmentList()
+const { getDepartmentList, departmentList, departmentListLoading } = useDepartmentList()
 
 async function openDialog(rowData: DepartmentListBaseType, type: string) {
   try {
@@ -261,7 +261,7 @@ async function handleDeleteDepartment(rowData: DepartmentListBaseType) {
       type: 'warning',
     })
 
-    loading.value = true
+    departmentListLoading.value = true
     const res = await deleteCurrentDepartmentAPI(rowData)
     handleResponseMessage(res.data)
     ElMessage({ type: 'success', message: '刪除部門成功' })
@@ -283,7 +283,7 @@ onMounted(async () => {
   <div class="app-container">
     <el-card shadow="never" class="table-container">
       <el-table
-        v-loading="loading"
+        v-loading="departmentListLoading"
         border
         :data="departmentList"
         row-key="id"
