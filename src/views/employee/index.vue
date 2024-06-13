@@ -107,9 +107,9 @@ const rules = reactive({
 const treeDataProps = ref({
   value: 'id',
   label: 'name',
+  checkStrictly: true,
   children: 'children',
 })
-const treeData = ref<DepartmentListBaseType[]>([])
 
 async function getEmployeeList() {
   loading.value = true
@@ -288,6 +288,8 @@ async function handleDeleteCurrentEmployee(id: number) {
   }
 }
 function changeDepartmentId(list: any) {
+  console.log('list', list)
+
   if (list.length === 0)
     return
   formData.value.departmentId = list[list.length - 1]
@@ -311,7 +313,6 @@ onMounted(() => {
   getDepartmentList()
   // departmentTreeRef.value.setCurrentKey(departmentId.value)
   getEmployeeList()
-  treeData.value = departmentList.value
 })
 </script>
 
@@ -503,7 +504,7 @@ onMounted(() => {
           <el-form-item label="部門" prop="departmentId">
             <el-cascader
               v-model="formData.departmentId"
-              :options="treeData"
+              :options="departmentList"
               :props="treeDataProps"
               separator="-"
               :value="formData.departmentId"
