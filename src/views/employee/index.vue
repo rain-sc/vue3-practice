@@ -288,8 +288,6 @@ async function handleDeleteCurrentEmployee(id: number) {
   }
 }
 function changeDepartmentId(list: any) {
-  console.log('list', list)
-
   if (list.length === 0)
     return
   formData.value.departmentId = list[list.length - 1]
