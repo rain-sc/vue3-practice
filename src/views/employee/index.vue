@@ -14,7 +14,6 @@ import {
 import type { EmployeeItemType, EmployeeParamsType } from '@/api/employee/types'
 import useDepartmentList from '@/hooks/useDepartmentList'
 import { employmentTypes } from '@/enums/TableEnum'
-import type { DepartmentListBaseType } from '@/api/department/types'
 
 defineOptions({
   name: 'Employee',
