@@ -46,13 +46,18 @@ const rules = reactive({
   ],
 })
 const buttonActionType = ref<string>('')
-const assignPermissionMenuRef = ref(ElTree)
+const assignPermissionRef = ref(ElTree)
 const permissionIds = ref()
 const currentRole = reactive({
   id: '',
   name: '',
 })
 const permissionList = ref()
+const assignPermissionDialog = reactive({
+  visible: false,
+  title: '',
+  submitbuttonLoading: false,
+})
 
 async function getRoleList() {
   loading.value = true
@@ -86,13 +91,6 @@ async function openDialog(actionType: string, data: RoleItemType) {
 
   else
     dialog.title = '新增角色'
-
-  if (buttonActionType.value === 'assignPermission') {
-    dialog.title = `分配${currentRole.name}權限`
-    const res = await getPermissionListAPI()
-    const resData = res.data.data
-    permissionList.value = transListToTreeData(resData, 0)
-  }
 }
 
 async function handleDelete(data: RoleItemType) {
@@ -125,21 +123,16 @@ function closeDialog() {
 }
 
 function resetForm() {
-  if (buttonActionType.value === 'add' || buttonActionType.value === 'edit') {
-    roleFormRef.value.resetFields()
-    roleFormRef.value.clearValidate()
+  roleFormRef.value.resetFields()
+  roleFormRef.value.clearValidate()
 
-    Object.assign(formData, {
-      name: '',
-      state: 0,
-      description: '',
-      id: '',
-      permIds: [],
-    })
-  }
-  else if (buttonActionType.value === 'assignPermission') {
-    permissionList.value = []
-  }
+  Object.assign(formData, {
+    name: '',
+    state: 0,
+    description: '',
+    id: '',
+    permIds: [],
+  })
 }
 
 async function handleSubmit() {
@@ -206,6 +199,26 @@ async function getCurrentRoleDetail(data: RoleItemType) {
   }
 }
 
+async function openAssignPermissionDialog(data: RoleItemType) {
+  assignPermissionDialog.visible = true
+  await getCurrentRoleDetail(data)
+  assignPermissionDialog.title = `分配${currentRole.name}權限`
+  const res = await getPermissionListAPI()
+  const resData = res.data.data
+  permissionList.value = transListToTreeData(resData, 0)
+}
+
+async function handleAssignPermissionSubmit() {
+
+}
+
+function closeAssignPermissionDialog() {
+  assignPermissionDialog.submitbuttonLoading = false
+  assignPermissionDialog.title = ''
+  assignPermissionDialog.visible = false
+  permissionList.value = []
+}
+
 onMounted(async () => {
   await getRoleList()
 })
@@ -246,7 +259,7 @@ onMounted(async () => {
                 type="primary"
                 size="small"
                 link
-                @click="openDialog('assignPermission', scope.row)"
+                @click="openAssignPermissionDialog(scope.row)"
               >
                 <el-icon><Position /></el-icon>分配權限
               </el-button>
@@ -318,7 +331,7 @@ onMounted(async () => {
             <template v-else-if="buttonActionType === 'assignPermission'">
               <el-scrollbar max-height="600px">
                 <el-tree
-                  ref="assignPermissionMenuRef"
+                  ref="assignPermissionRef"
                   node-key="id"
                   :data="permissionList"
                   :props="{ label: 'name' }"
@@ -338,6 +351,36 @@ onMounted(async () => {
               </el-button>
             </div>
           </div>
+        </el-dialog>
+
+        <el-dialog
+          v-model="assignPermissionDialog.visible"
+          :title="assignPermissionDialog.title"
+          width="800px"
+          @close="closeAssignPermissionDialog"
+        >
+          <el-scrollbar v-loading="loading" max-height="600px">
+            <el-tree
+              ref="assignPermissionRef"
+              node-key="id"
+              :data="permissionList"
+              :props="{ label: 'name' }"
+              show-checkbox
+              default-expand-all
+              :default-checked-keys="permissionIds"
+            />
+          </el-scrollbar>
+
+          <template #footer>
+            <div class="dialog-footer">
+              <el-button type="primary" @click="handleAssignPermissionSubmit">
+                確定
+              </el-button>
+              <el-button @click="closeAssignPermissionDialog">
+                取消
+              </el-button>
+            </div>
+          </template>
         </el-dialog>
       </el-card>
     </div>
