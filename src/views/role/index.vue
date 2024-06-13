@@ -52,11 +52,12 @@ const currentRole = reactive({
   id: '',
   name: '',
 })
-const permissionList = ref()
+const permissionList = ref([])
 const assignPermissionDialog = reactive({
   visible: false,
   title: '',
   submitbuttonLoading: false,
+  loading: false,
 })
 
 async function getRoleList() {
@@ -200,12 +201,21 @@ async function getCurrentRoleDetail(data: RoleItemType) {
 }
 
 async function openAssignPermissionDialog(data: RoleItemType) {
-  assignPermissionDialog.visible = true
-  await getCurrentRoleDetail(data)
-  assignPermissionDialog.title = `分配${currentRole.name}權限`
-  const res = await getPermissionListAPI()
-  const resData = res.data.data
-  permissionList.value = transListToTreeData(resData, 0)
+  try {
+    assignPermissionDialog.visible = true
+    assignPermissionDialog.loading = true
+    await getCurrentRoleDetail(data)
+    assignPermissionDialog.title = `分配${currentRole.name}權限`
+    const res = await getPermissionListAPI()
+    const resData = res.data.data
+    permissionList.value = transListToTreeData(resData, 0)
+  }
+  catch (error) {
+    console.error(error)
+  }
+  finally {
+    assignPermissionDialog.loading = false
+  }
 }
 
 async function handleAssignPermissionSubmit() {
@@ -376,7 +386,7 @@ onMounted(() => {
           width="800px"
           @close="closeAssignPermissionDialog"
         >
-          <el-scrollbar v-loading="loading" max-height="600px">
+          <el-scrollbar v-loading="assignPermissionDialog.loading" max-height="600px">
             <el-tree
               ref="assignPermissionRef"
               node-key="id"
