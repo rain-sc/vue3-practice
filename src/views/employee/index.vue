@@ -601,6 +601,7 @@ onMounted(() => {
             v-for="item in roleList"
             :key="item.id"
             :label="item.id"
+            :value="item.id"
           >
             {{ item.name }}
           </el-checkbox>
