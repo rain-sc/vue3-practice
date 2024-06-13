@@ -1,7 +1,3 @@
-export interface PermissionListBaseType {
-  data: PermissionItemType[]
-}
-
 export interface PermissionItemType {
   code?: string
   description?: string
@@ -10,4 +6,6 @@ export interface PermissionItemType {
   name?: string
   pid?: string | number
   type?: string | number
+  createTIme?: string
+  update_time?: string
 }

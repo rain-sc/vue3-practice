@@ -1,4 +1,4 @@
-import type { PermissionItemType, PermissionListBaseType } from './types'
+import type { PermissionItemType } from './types'
 import type { ResponseData } from '@/types/global'
 import { http } from '@/utils/request'
 
@@ -20,5 +20,19 @@ export function deleteCurrentPermissionAPI(data: PermissionItemType) {
   return http({
     url: `sys/permission/${data.id}`,
     method: 'DELETE',
+  })
+}
+
+export function getCurrenPermissionDetailAPI(data: PermissionItemType) {
+  return http<ResponseData<PermissionItemType>>({
+    url: `sys/permission/${data.id}`,
+  })
+}
+
+export function editCurrenPermissionAPI(data: PermissionItemType) {
+  return http({
+    url: `sys/permission/${data.id}`,
+    method: 'PUT',
+    data,
   })
 }

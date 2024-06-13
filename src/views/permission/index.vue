@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ElMessage } from 'element-plus'
-import { addPermissionAPI, deleteCurrentPermissionAPI, getPermissionListAPI } from '@/api/permission'
+import { addPermissionAPI, deleteCurrentPermissionAPI, editCurrenPermissionAPI, getCurrenPermissionDetailAPI, getPermissionListAPI } from '@/api/permission'
 import type { PermissionItemType } from '@/api/permission/types'
 import { transListToTreeData } from '@/utils'
 
@@ -80,8 +80,14 @@ function submitForm() {
     if (isValid) {
       dialog.submitLoading = true
       try {
-        await addPermissionAPI(permissionData.value)
-        ElMessage.success('新增成功')
+        if (dialog.type === 'add') {
+          await addPermissionAPI(permissionData.value)
+          ElMessage.success('新增成功')
+        }
+        else if (dialog.type === 'edit') {
+          await editCurrenPermissionAPI(permissionData.value)
+          ElMessage.success('修改成功')
+        }
       }
       catch (error) {
         console.error(error)
@@ -95,13 +101,16 @@ function submitForm() {
   })
 }
 
-function openDialog(dialogType: string, pid: number, type: number) {
+async function openDialog(dialogType: string, pid: number, type: number, row: PermissionItemType) {
   dialog.visible = true
   dialog.type = dialogType
   if (dialog.type === 'add') {
     dialog.title = '新增權限點'
     permissionData.value.pid = pid
     permissionData.value.type = type
+  }
+  else if (dialog.type === 'edit') {
+    await getCurrenPermissionDetail(row)
   }
 }
 
@@ -120,6 +129,17 @@ async function handleDeleteCurrentPermission(data: PermissionItemType) {
   }
   finally {
     getPermissionList()
+  }
+}
+
+async function getCurrenPermissionDetail(data: PermissionItemType) {
+  try {
+    const res = await getCurrenPermissionDetailAPI(data)
+    const resData = res.data.data!
+    permissionData.value = resData
+  }
+  catch (error) {
+    console.error(error)
   }
 }
 
@@ -161,6 +181,7 @@ onMounted(() => {
               type="primary"
               link
               size="small"
+              @click="openDialog('edit', '', '', row)"
             >
               編輯
             </el-button>
@@ -213,10 +234,10 @@ onMounted(() => {
               :loading="dialog.submitLoading"
               @click="submitForm"
             >
-              确 定
+              確定
             </el-button>
             <el-button @click="closeDialog">
-              取 消
+              取消
             </el-button>
           </div>
         </template>
