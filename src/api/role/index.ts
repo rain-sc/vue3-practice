@@ -37,3 +37,11 @@ export function deleteCurrentRoleAPI(data: RoleItemType) {
     method: 'DELETE',
   })
 }
+
+export function assignPermissionAPI(data: RoleItemType) {
+  return http({
+    url: `sys/role/assignPrem`,
+    method: 'PUT',
+    data,
+  })
+}

@@ -3,6 +3,8 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import { addRoleAPI, deleteCurrentRoleAPI, editCurrentRoleAPI, getCurrentRoleDetailAPI, getRoleListAPI } from '@/api/role'
 import type { RoleItemType, RoleListParamsType } from '@/api/role/types'
 import { State } from '@/enums/TableEnum'
+import { getPermissionListAPI } from '@/api/permission'
+import { transListToTreeData } from '@/utils'
 
 defineOptions({
   name: 'Role',
@@ -44,6 +46,13 @@ const rules = reactive({
   ],
 })
 const buttonActionType = ref<string>('')
+const assignPermissionMenuRef = ref(ElTree)
+const permissionIds = ref()
+const currentRole = reactive({
+  id: '',
+  name: '',
+})
+const permissionList = ref()
 
 async function getRoleList() {
   loading.value = true
@@ -61,10 +70,6 @@ async function getRoleList() {
   }
 }
 
-function openMenuDialog() {
-
-}
-
 async function openDialog(actionType: string, data: RoleItemType) {
   buttonActionType.value = actionType
 
@@ -75,13 +80,18 @@ async function openDialog(actionType: string, data: RoleItemType) {
       return
   }
 
-  if (data.id) {
-    dialog.visible = true
+  dialog.visible = true
+  if (data.id)
     dialog.title = '修改角色'
-  }
-  else {
-    dialog.visible = true
+
+  else
     dialog.title = '新增角色'
+
+  if (buttonActionType.value === 'assignPermission') {
+    dialog.title = `分配${currentRole.name}權限`
+    const res = await getPermissionListAPI()
+    const resData = res.data.data
+    permissionList.value = transListToTreeData(resData, 0)
   }
 }
 
@@ -115,16 +125,21 @@ function closeDialog() {
 }
 
 function resetForm() {
-  roleFormRef.value.resetFields()
-  roleFormRef.value.clearValidate()
+  if (buttonActionType.value === 'add' || buttonActionType.value === 'edit') {
+    roleFormRef.value.resetFields()
+    roleFormRef.value.clearValidate()
 
-  Object.assign(formData, {
-    name: '',
-    state: 0,
-    description: '',
-    id: '',
-    permIds: [],
-  })
+    Object.assign(formData, {
+      name: '',
+      state: 0,
+      description: '',
+      id: '',
+      permIds: [],
+    })
+  }
+  else if (buttonActionType.value === 'assignPermission') {
+    permissionList.value = []
+  }
 }
 
 async function handleSubmit() {
@@ -172,6 +187,8 @@ async function getCurrentRoleDetail(data: RoleItemType) {
     dialog.loading = true
     const res = await getCurrentRoleDetailAPI(data)
     const resData = res.data
+    Object.assign(currentRole, { id: resData.data?.id, name: resData.data?.name })
+    permissionIds.value = resData.data?.permIds
     if (!resData.success && resData.code === 10000) {
       ElMessage({ type: 'error', message: '此角色不存在' })
       dialog.visible = false
@@ -229,7 +246,7 @@ onMounted(async () => {
                 type="primary"
                 size="small"
                 link
-                @click="openMenuDialog(scope.row)"
+                @click="openDialog('assignPermission', scope.row)"
               >
                 <el-icon><Position /></el-icon>分配權限
               </el-button>
@@ -268,41 +285,58 @@ onMounted(async () => {
           @close="closeDialog"
         >
           <div v-loading="dialog.loading">
-            <el-form
-              ref="roleFormRef"
-              :model="formData"
-              :rules="rules"
-              label-width="100px"
-            >
-              <el-form-item label="角色名稱" prop="name">
-                <el-input v-model="formData.name" placeholder="請輸入角色名稱" />
-              </el-form-item>
-              <el-form-item label="啟用" prop="state">
-                <el-switch
-                  v-model="formData.state"
-                  :active-value="State.ENABLED"
-                  :inactive-value="State.DISABLED"
+            <template v-if="buttonActionType === 'add' || buttonActionType === 'edit'">
+              <el-form
+                ref="roleFormRef"
+                :model="formData"
+                :rules="rules"
+                label-width="100px"
+              >
+                <el-form-item label="角色名稱" prop="name">
+                  <el-input v-model="formData.name" placeholder="請輸入角色名稱" />
+                </el-form-item>
+                <el-form-item label="啟用" prop="state">
+                  <el-switch
+                    v-model="formData.state"
+                    :active-value="State.ENABLED"
+                    :inactive-value="State.DISABLED"
+                  />
+                </el-form-item>
+                <el-form-item prop="description" label="角色描述">
+                  <el-input
+                    v-model="formData.description"
+                    type="textarea"
+                    :rows="5"
+                    style="width:300px"
+                    resize="none"
+                    placeholder="請輸入角色描述"
+                  />
+                </el-form-item>
+              </el-form>
+            </template>
+
+            <template v-else-if="buttonActionType === 'assignPermission'">
+              <el-scrollbar max-height="600px">
+                <el-tree
+                  ref="assignPermissionMenuRef"
+                  node-key="id"
+                  :data="permissionList"
+                  :props="{ label: 'name' }"
+                  show-checkbox
+                  default-expand-all
+                  :default-checked-keys="permissionIds"
                 />
-              </el-form-item>
-              <el-form-item prop="description" label="角色描述">
-                <el-input
-                  v-model="formData.description"
-                  type="textarea"
-                  :rows="5"
-                  style="width:300px"
-                  resize="none"
-                  placeholder="請輸入角色描述"
-                />
-              </el-form-item>
-              <div class="dialog-footer text-end">
-                <el-button type="primary" @click="handleSubmit">
-                  確定
-                </el-button>
-                <el-button @click="closeDialog">
-                  取消
-                </el-button>
-              </div>
-            </el-form>
+              </el-scrollbar>
+            </template>
+
+            <div class="dialog-footer text-end">
+              <el-button type="primary" @click="handleSubmit">
+                確定
+              </el-button>
+              <el-button @click="closeDialog">
+                取消
+              </el-button>
+            </div>
           </div>
         </el-dialog>
       </el-card>
