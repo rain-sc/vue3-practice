@@ -231,7 +231,7 @@ const handleSubmit = useThrottleFn(async () => {
   }
   else if (dialog.type === 'employeeForm') {
     const validateForm = () => new Promise((resolve) => {
-      employeeFormRef.value.validate((valid: any) => {
+      employeeFormRef.value.validate((valid: boolean) => {
         resolve(valid)
       })
     })
