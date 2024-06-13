@@ -2,6 +2,7 @@
 import { ElMessage } from 'element-plus'
 import { addPermissionAPI, deleteCurrentPermissionAPI, getPermissionListAPI } from '@/api/permission'
 import type { PermissionItemType } from '@/api/permission/types'
+import { transListToTreeData } from '@/utils'
 
 defineOptions({
   name: 'Permission',
@@ -47,7 +48,7 @@ async function getPermissionList() {
   try {
     const res = await getPermissionListAPI()
     const resData = res.data.data
-    permissionList.value = resData!
+    permissionList.value = transListToTreeData(resData!, 0)
   }
   catch (error) {
     console.error(error)
@@ -58,6 +59,8 @@ async function getPermissionList() {
 }
 
 function closeDialog() {
+  permissionFormRef.value.resetFields()
+  permissionFormRef.value.clearValidate()
   dialog.submitLoading = false
   dialog.title = ''
   dialog.type = ''
@@ -75,6 +78,7 @@ function closeDialog() {
 function submitForm() {
   permissionFormRef.value.validate(async (isValid: boolean) => {
     if (isValid) {
+      dialog.submitLoading = true
       try {
         await addPermissionAPI(permissionData.value)
         ElMessage.success('新增成功')
@@ -83,6 +87,7 @@ function submitForm() {
         console.error(error)
       }
       finally {
+        dialog.submitLoading = false
         closeDialog()
         getPermissionList()
       }
@@ -135,6 +140,8 @@ onMounted(() => {
       <el-table
         v-loading="loading"
         :data="permissionList"
+        default-expand-all
+        row-key="id"
       >
         <el-table-column label="名稱" prop="name" />
         <el-table-column label="標識" prop="code" />
@@ -146,6 +153,7 @@ onMounted(() => {
               type="primary"
               link
               size="small"
+              @click="openDialog('add', row.id, 2)"
             >
               新增
             </el-button>
@@ -200,7 +208,11 @@ onMounted(() => {
         </el-form>
         <template #footer>
           <div class="dialog-footer">
-            <el-button type="primary" @click="submitForm">
+            <el-button
+              type="primary"
+              :loading="dialog.submitLoading"
+              @click="submitForm"
+            >
               确 定
             </el-button>
             <el-button @click="closeDialog">
