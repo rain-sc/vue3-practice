@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { addRoleAPI, deleteCurrentRoleAPI, editCurrentRoleAPI, getCurrentRoleDetailAPI, getRoleListAPI } from '@/api/role'
+import { addRoleAPI, assignPermissionAPI, deleteCurrentRoleAPI, editCurrentRoleAPI, getCurrentRoleDetailAPI, getRoleListAPI } from '@/api/role'
 import type { RoleItemType, RoleListParamsType } from '@/api/role/types'
 import { State } from '@/enums/TableEnum'
 import { getPermissionListAPI } from '@/api/permission'
@@ -209,7 +209,24 @@ async function openAssignPermissionDialog(data: RoleItemType) {
 }
 
 async function handleAssignPermissionSubmit() {
-
+  assignPermissionDialog.submitbuttonLoading = true
+  permissionIds.value = assignPermissionRef.value
+    .getCheckedNodes(false, true)
+    .map((node: any) => node.id)
+  try {
+    await assignPermissionAPI({
+      id: currentRole.id,
+      permIds: permissionIds.value,
+    })
+    ElMessage.success(`${currentRole.name}權限分配成功`)
+  }
+  catch (error) {
+    console.error(error)
+  }
+  finally {
+    closeAssignPermissionDialog()
+    getRoleList()
+  }
 }
 
 function closeAssignPermissionDialog() {
@@ -219,8 +236,8 @@ function closeAssignPermissionDialog() {
   permissionList.value = []
 }
 
-onMounted(async () => {
-  await getRoleList()
+onMounted(() => {
+  getRoleList()
 })
 </script>
 
@@ -373,7 +390,11 @@ onMounted(async () => {
 
           <template #footer>
             <div class="dialog-footer">
-              <el-button type="primary" @click="handleAssignPermissionSubmit">
+              <el-button
+                type="primary"
+                :loading="assignPermissionDialog.submitbuttonLoading"
+                @click="handleAssignPermissionSubmit"
+              >
                 確定
               </el-button>
               <el-button @click="closeAssignPermissionDialog">
