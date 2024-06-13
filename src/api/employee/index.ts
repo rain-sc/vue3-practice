@@ -1,3 +1,4 @@
+import type { RoleItemType } from '../role/types'
 import type { EmployeeItemType, EmployeeListBaseType, EmployeeParamsType } from './types'
 import type { ResponseData } from '@/types/global'
 import { http } from '@/utils/request'
@@ -61,6 +62,20 @@ export function addEmployeeAPI(data: EmployeeItemType) {
   return http({
     url: 'sys/user',
     method: 'POST',
+    data,
+  })
+}
+
+export function getEnableRoleListAPI() {
+  return http<ResponseData<RoleItemType[]>>({
+    url: 'sys/role/list/enabled',
+  })
+}
+
+export function assignRoleAPI(data: EmployeeItemType) {
+  return http({
+    url: '/sys/user/assignRoles',
+    method: 'put',
     data,
   })
 }

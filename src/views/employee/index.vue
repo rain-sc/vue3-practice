@@ -3,17 +3,20 @@ import FileSaver from 'file-saver'
 import { ElDialog, ElMessage, ElUpload } from 'element-plus'
 import {
   addEmployeeAPI,
+  assignRoleAPI,
   deleteCurrentEmployeeAPI,
   editCurrentEmployeeAPI,
   exportEmployeeListAPI,
   getCurrentEmployeeDetailAPI,
   getEmployeeListAPI,
+  getEnableRoleListAPI,
   importEmployeeListAPI,
   importEmployeeTemplateAPI,
 } from '@/api/employee'
 import type { EmployeeItemType, EmployeeParamsType } from '@/api/employee/types'
 import useDepartmentList from '@/hooks/useDepartmentList'
 import { employmentTypes } from '@/enums/TableEnum'
+import type { RoleItemType } from '@/api/role/types'
 
 defineOptions({
   name: 'Employee',
@@ -109,6 +112,9 @@ const treeDataProps = ref({
   checkStrictly: true,
   children: 'children',
 })
+const roleList = ref<RoleItemType[]>([])
+const roleIds = ref<string[]>([])
+const currentEmployeeId = ref()
 
 async function getEmployeeList() {
   loading.value = true
@@ -177,11 +183,18 @@ async function openDialog(type: string, data?: EmployeeItemType) {
   else if (dialog.type === 'importEmployeeList') {
     dialog.title = '員工列表導入'
   }
+  else if (dialog.type === 'assignRole') {
+    dialog.title = '分配角色'
+
+    await getCurrentEmployeeDetail(data!)
+    roleIds.value = formData.value.roleIds!
+    currentEmployeeId.value = data?.id
+    await getEnableRoleList()
+  }
 }
 
 function closeDialog() {
   dialog.visible = false
-
   if (dialog.type === 'employeeForm') {
     employeeFormRef.value.resetFields()
     employeeFormRef.value.clearValidate()
@@ -190,6 +203,10 @@ function closeDialog() {
   else if (dialog.type === 'importEmployeeList') {
     importData.file = undefined
     importData.fileList = []
+  }
+  else if (dialog.type === 'assignRole') {
+    roleIds.value = []
+    roleList.value = []
   }
   dialog.loading = false
   dialog.type = ''
@@ -266,6 +283,24 @@ const handleSubmit = useThrottleFn(async () => {
       dialog.submitLoading = false
     }
   }
+  else if (dialog.type === 'assignRole') {
+    try {
+      await assignRoleAPI({
+        id: currentEmployeeId.value,
+        roleIds: roleIds.value,
+      })
+      ElMessage.success('分配角色成功')
+      closeDialog()
+      getEmployeeList()
+      getDepartmentList()
+    }
+    catch (error) {
+      console.error(error)
+    }
+    finally {
+      dialog.submitLoading = false
+    }
+  }
 }, 3000)
 
 async function handleDeleteCurrentEmployee(id: number) {
@@ -306,6 +341,18 @@ async function getCurrentEmployeeDetail(data: EmployeeItemType) {
     dialog.loading = false
   }
 }
+
+async function getEnableRoleList() {
+  try {
+    const res = await getEnableRoleListAPI()
+    const resData = res.data.data!
+    roleList.value = resData
+  }
+  catch (error) {
+    console.error(error)
+  }
+}
+
 onMounted(() => {
   getDepartmentList()
   // departmentTreeRef.value.setCurrentKey(departmentId.value)
@@ -406,6 +453,14 @@ onMounted(() => {
                   <el-icon><Edit /></el-icon>編輯
                 </el-button>
                 <el-button
+                  type="primary"
+                  link
+                  size="small"
+                  @click="openDialog('assignRole', scope.row)"
+                >
+                  <el-icon><User /></el-icon>角色
+                </el-button>
+                <el-button
                   size="small"
                   link
                   type="primary"
@@ -471,7 +526,6 @@ onMounted(() => {
         v-loading="dialog.loading"
       >
         <el-form
-
           ref="employeeFormRef"
           :model="formData"
           :rules="rules"
@@ -538,6 +592,20 @@ onMounted(() => {
         </el-form>
       </div>
 
+      <div
+        v-if="dialog.type === 'assignRole'"
+        v-loading="dialog.loading"
+      >
+        <el-checkbox-group v-model="roleIds">
+          <el-checkbox
+            v-for="item in roleList"
+            :key="item.id"
+            :label="item.id"
+          >
+            {{ item.name }}
+          </el-checkbox>
+        </el-checkbox-group>
+      </div>
       <div class="dialog-footer">
         <el-button
           :loading="dialog.submitLoading"
