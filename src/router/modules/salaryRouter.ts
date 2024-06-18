@@ -3,6 +3,7 @@ import Layout from '@/layout/index.vue'
 export const salaryRouter = {
   path: '/salary',
   component: Layout,
+  name: 'salary',
   children: [{
     path: '',
     name: 'salary',

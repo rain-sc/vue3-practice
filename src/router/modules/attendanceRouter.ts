@@ -2,6 +2,7 @@ import Layout from '@/layout/index.vue'
 
 export const attendanceRouter = {
   path: '/attendance',
+  name: 'attendance',
   component: Layout,
   children: [{
     path: '',

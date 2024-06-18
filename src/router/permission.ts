@@ -1,5 +1,5 @@
 import nprogress from 'nprogress'
-import router from './index'
+import router, { asyncRoutes } from './index'
 import 'nprogress/nprogress.css'
 import { getToken } from '@/utils/auth'
 import { useUserStoreHook } from '@/store/modules/user'
@@ -16,13 +16,20 @@ router.beforeEach(async (to, from, next) => {
     }
     else {
       const userIn = userStore.userProfile.userId
+
       if (userIn) {
         next()
       }
       else {
         try {
           await userStore.getUserProfile()
-          next()
+          const menus = userStore.userProfile.roles.menus
+          const filterRoutes = asyncRoutes.filter(item => menus.includes(item.name))
+          filterRoutes.forEach((route) => {
+            router.addRoute(route)
+          })
+          userStore.defautlRoutes.push(...filterRoutes)
+          next({ ...to, replace: true })
         }
         catch (error) {
           await userStore.resetToken()

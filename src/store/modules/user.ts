@@ -6,10 +6,11 @@ import { getToken, setToken } from '@/utils/auth'
 import { getUserProfileAPI } from '@/api/user'
 import store from '@/store'
 import type { UserProfileType } from '@/api/user/types'
+import { routes } from '@/router'
 
 export const useUserStore = defineStore('user', () => {
   const token = ref(getToken() || '')
-  const userProfile = ref<UserProfileType>({
+  const userProfile = reactive<UserProfileType>({
     userId: '',
     mobile: '',
     username: '',
@@ -22,6 +23,7 @@ export const useUserStore = defineStore('user', () => {
     company: '',
     staffPhoto: '',
   })
+  const defautlRoutes = ref(routes)
 
   async function login(loginData: LoginDataType) {
     const res = await loginAPI(loginData)
@@ -45,7 +47,7 @@ export const useUserStore = defineStore('user', () => {
   async function getUserProfile() {
     try {
       const res = await getUserProfileAPI()
-      Object.assign(userProfile.value, res.data.data)
+      Object.assign(userProfile, res.data.data)
     }
     catch (error) {
       console.error(error)
@@ -69,6 +71,7 @@ export const useUserStore = defineStore('user', () => {
     resetToken,
     userProfile,
     logout,
+    defautlRoutes,
   }
 })
 

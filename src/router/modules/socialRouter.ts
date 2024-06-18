@@ -3,6 +3,7 @@ import Layout from '@/layout/index.vue'
 export const socialRouter = {
   path: '/social',
   component: Layout,
+  name: 'social',
   children: [{
     path: '',
     name: 'social',
