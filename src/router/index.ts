@@ -58,6 +58,9 @@ export const routes: RouteRecordRaw[] = [
       },
     ],
   },
+]
+
+export const asyncRoutes = [
   departmentRouter,
   roleRouter,
   employeeRouter,

@@ -1,4 +1,4 @@
-import { Layout } from '..'
+import Layout from '@/layout/index.vue'
 
 export const socialRouter = {
   path: '/social',
