@@ -5,7 +5,7 @@
 <template>
   <div class="container">
     <div class="app-container">
-      f
+      社保
     </div>
   </div>
 </template>

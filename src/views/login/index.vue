@@ -3,6 +3,10 @@ import type { FormInstance } from 'element-plus'
 import type { LoginDataType } from '@/api/auth/types'
 import { useUserStore } from '@/store'
 
+defineOptions({
+  name: 'Login',
+  inheritAttrs: false,
+})
 const form = ref<FormInstance>()
 const loginForm = ref<LoginDataType>({
   mobile: '13800000002',

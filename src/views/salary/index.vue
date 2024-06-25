@@ -5,7 +5,7 @@
 <template>
   <div class="container">
     <div class="app-container">
-      f
+      工資
     </div>
   </div>
 </template>
