@@ -6,6 +6,7 @@ export interface UserProfileType {
   companyId: string
   company: string
   staffPhoto: string
+  departmentName: string
 }
 
 export interface UserRolesType {

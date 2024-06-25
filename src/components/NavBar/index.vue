@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { ElMessageBox } from 'element-plus'
 import { useAppStore, useUserStore } from '@/store'
 
 const userStore = useUserStore()
