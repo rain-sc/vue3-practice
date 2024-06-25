@@ -15,6 +15,7 @@ export interface ProvidentFundItem {
   declarationTotal: number
   declaredTotal: number
   declaringTotal: number
+  toDeclareTotal: number
   xAxis: string[]
   yAxis: number[]
 }
@@ -25,4 +26,6 @@ export interface SocialInsuranceItem {
   declaredTotal: number
   declaringTotal: number
   toDeclareTotal: number
+  xAxis: string[]
+  yAxis: number[]
 }

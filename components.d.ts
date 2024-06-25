@@ -51,6 +51,7 @@ declare module 'vue' {
     IEpDownload: typeof import('~icons/ep/download')['default']
     IEpEdit: typeof import('~icons/ep/edit')['default']
     IEpUploadFilled: typeof import('~icons/ep/upload-filled')['default']
+    Line: typeof import('./src/components/Charts/Line.vue')['default']
     NavBar: typeof import('./src/components/NavBar/index.vue')['default']
     Pagination: typeof import('./src/components/Pagination/index.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
