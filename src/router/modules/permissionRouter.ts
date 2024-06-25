@@ -9,7 +9,7 @@ export const permissionRouter = {
     name: 'permission',
     component: () => import('@/views/permission/index.vue'),
     meta: {
-      title: 'Permission',
+      title: '權限',
       icon: 'lock',
     },
   }],

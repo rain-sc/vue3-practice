@@ -395,7 +395,7 @@ onMounted(() => {
       <el-col :lg="20" :xs="24">
         <div class="search-container">
           <el-row class="opeate-tools gap-x-2" type="flex" justify="end">
-            <el-button type="primary" @click="openDialog('employeeForm')">
+            <el-button v-permission="'add'" type="primary" @click="openDialog('employeeForm')">
               新增員工
             </el-button>
             <el-dropdown split-button>

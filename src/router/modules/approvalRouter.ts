@@ -9,7 +9,7 @@ export const approvalRouter = {
     name: 'approval',
     component: () => import('@/views/approval/index.vue'),
     meta: {
-      title: 'Approval',
+      title: '審批',
       icon: 'tree-table',
     },
   }],

@@ -9,7 +9,7 @@ export const departmentRouter = {
     name: 'department',
     component: () => import('@/views/department/index.vue'),
     meta: {
-      title: 'Department',
+      title: '部門',
       icon: 'tree',
     },
   }],

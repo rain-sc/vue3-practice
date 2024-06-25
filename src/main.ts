@@ -11,11 +11,13 @@ import '@/router/permission'
 import '@/assets/styles/index.scss'
 import 'uno.css'
 import 'animate.css'
+import { setupDirective } from '@/directive'
 
 const app = createApp(App)
 for (const [key, component] of Object.entries(ElementPlusIconsVue))
   app.component(key, component)
 
 app.use(store).use(router).use(ElementPlus)
+setupDirective(app)
 
 app.mount('#app')

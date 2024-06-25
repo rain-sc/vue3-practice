@@ -9,7 +9,7 @@ export const attendanceRouter = {
     name: 'attendance',
     component: () => import('@/views/attendance/index.vue'),
     meta: {
-      title: 'Attendance',
+      title: '考勤',
       icon: 'excel',
     },
   }],

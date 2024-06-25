@@ -9,7 +9,7 @@ export const roleRouter = {
     name: 'role',
     component: () => import('@/views/role/index.vue'),
     meta: {
-      title: 'Role',
+      title: '角色',
       icon: 'setting',
     },
   }],

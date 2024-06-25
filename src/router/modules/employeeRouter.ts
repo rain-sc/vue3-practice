@@ -9,7 +9,7 @@ export const employeeRouter = {
     name: 'employee',
     component: () => import('@/views/employee/index.vue'),
     meta: {
-      title: 'Employee',
+      title: '員工',
       icon: 'people',
     },
   }],

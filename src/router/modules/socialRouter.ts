@@ -9,7 +9,7 @@ export const socialRouter = {
     name: 'social',
     component: () => import('@/views/social/index.vue'),
     meta: {
-      title: 'Social',
+      title: '社保',
       icon: 'table',
     },
   }],

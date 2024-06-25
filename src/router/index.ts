@@ -39,7 +39,7 @@ export const routes: RouteRecordRaw[] = [
         component: () => import('@/views/dashboard/index.vue'),
         name: 'Dashboard',
         meta: {
-          title: 'Dashboard',
+          title: '首頁',
           icon: 'dashboard',
           affix: true,
           keepAlive: true,

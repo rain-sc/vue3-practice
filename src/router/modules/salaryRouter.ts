@@ -9,7 +9,7 @@ export const salaryRouter = {
     name: 'salary',
     component: () => import('@/views/salary/index.vue'),
     meta: {
-      title: 'Salary',
+      title: '工資',
       icon: 'money',
     },
   }],
