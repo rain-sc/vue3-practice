@@ -10,7 +10,7 @@ defineOptions({
 const form = ref<FormInstance>()
 const loginForm = ref<LoginDataType>({
   mobile: '13800000002',
-  password: 'itHeiMa@${new Date().toISOString().slice(0, 10).replace(/-/g, '')}',
+  password: `itHeiMa@${new Date().toISOString().slice(0, 10).replace(/-/g, '')}`,
   isAgree: true,
 })
 const userStore = useUserStore()
